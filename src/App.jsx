@@ -1,9 +1,10 @@
 import { useReducer } from "react";
-import Navbar from "./components/Navbar";
-import Timer from "./components/Timer";
-import Settings from "./components/Settings";
-import Tasks from "./components/Tasks";
-import Summary from "./components/Summary";
+import Settings from "./Components/Settings/Settings";
+import Tasks from "./Components/Tasks/Tasks";
+import Summary from "./Components/Summary";
+import Timer from "./Components/Timer/Timer"
+import Navbar from "./Components/Navbar";
+import { TimerContext,TasksContext, IsOpenContext, CountdownContext } from "./Components/Contexts/Context";
 
 // initial states
 // #1
@@ -118,8 +119,13 @@ function timerReducer(timerState, action) {
         ...timerState,
         timerId: action.timerId,
       };
-    case "changeTimers":
-      return { ...timerState, timers: action.timers };
+    case "changeTimerSettings":
+      return {
+        ...timerState,
+        timers: action.timers,
+        autoStartBreaks: action.autoStartBreaks,
+        autoStartPomodoros: action.autoStartPomodoros,
+      };
     case "changeMode":
       return {
         ...timerState,
@@ -127,11 +133,11 @@ function timerReducer(timerState, action) {
         status: action.status,
         timerId: action.timerId,
       };
-    case "changeAutoStart":
-      return {
-        ...timerState,
-        [action.autoStart]: !timerState[action.autoStart],
-      };
+    // case "changeAutoStart":
+    //   return {
+    //     ...timerState,
+    //     [action.autoStart]: !timerState[action.autoStart],
+    //   };
   }
 }
 
@@ -210,7 +216,6 @@ function isOpenReducer(isOpenState, action) {
 }
 
 function App() {
-  // const [state, dispatch] = useReducer(reducer, initialState);
   const [timerState, dispatchTimerState] = useReducer(
     timerReducer,
     initialTimerState
@@ -227,37 +232,25 @@ function App() {
     isOpenReducer,
     initialIsOpenState
   );
+
   return (
-    <div className="app">
-      <Navbar dispatch={dispatchIsOpen} />
-      {isOpenState.settings && (
-        <Settings
-          dispatchIsOpen={dispatchIsOpen}
-          dispatchTimerState={dispatchTimerState}
-          dispatchCountdown={dispatchCountdown}
-          countdownState={countdownState}
-          timerState={timerState}
-        />
-      )}
-      <Timer
-        timerState={timerState}
-        dispatchTimerState={dispatchTimerState}
-        countdownState={countdownState}
-        dispatchCountdown={dispatchCountdown}
-        tasksState={tasksState}
-        dispatchTasks={dispatchTasks}
-      />
-      <Tasks
-        dispatch={dispatchTasks}
-        tasks={tasksState.tasks}
-        currentTask={tasksState.currentTask}
-        completedPomodoros={timerState.completedPomodoros}
-        mode={timerState.mode}
-      />
-      {tasksState.tasks.length > 0 && (
-        <Summary tasks={tasksState.tasks} timers={timerState.timers} />
-      )}
-    </div>
+    <TimerContext.Provider value={{ timerState, dispatchTimerState }}>
+      <TasksContext.Provider value={{ tasksState, dispatchTasks }}>
+        <CountdownContext.Provider
+          value={{ countdownState, dispatchCountdown }}
+        >
+          <IsOpenContext.Provider value={{ isOpenState, dispatchIsOpen }}>
+            <div className="app">
+              <Navbar />
+              {isOpenState.settings && <Settings />}
+              <Timer/>
+              <Tasks />
+              {tasksState.tasks.length > 0 && <Summary />}
+            </div>
+          </IsOpenContext.Provider>
+        </CountdownContext.Provider>
+      </TasksContext.Provider>
+    </TimerContext.Provider>
   );
 }
 

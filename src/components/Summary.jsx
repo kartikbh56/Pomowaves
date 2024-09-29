@@ -1,6 +1,14 @@
+import { useContext } from "react";
+import { TasksContext, TimerContext } from "./Contexts/Context";
+
 /* eslint-disable react/prop-types */
-export default function Summary({ tasks, timers }) {
-  // console.log("summary rendered")
+export default function Summary() {
+
+  const {tasksState} = useContext(TasksContext)
+  const {tasks} = tasksState
+  const {timerState} = useContext(TimerContext)
+  const {timers} = timerState
+
   const totalPomodoros = tasks.reduce(
     (acc, cur) => ({
       estimated: acc.estimated + cur.estimated,
@@ -24,10 +32,9 @@ export default function Summary({ tasks, timers }) {
 
   const finishAt = new Date(Date.now() + timeRequired * 1000);
   const finishAtHrs24h = finishAt.getHours();
-  const finishAtHrs12h =
-    finishAtHrs24h > 12 ? finishAtHrs24h - 12 : finishAtHrs24h;
+  const finishAtHrs12h = finishAtHrs24h%12 || 12
   const finishAtMins = finishAt.getMinutes();
-  const meridian = finishAtHrs24h >= 12 ? " PM " : " AM ";
+  const meridiem = finishAtHrs24h >= 12 ? " PM " : " AM ";
 
   return (
     <div className="summary">
@@ -47,7 +54,7 @@ export default function Summary({ tasks, timers }) {
           {String(finishAtHrs12h).padStart(2, "0") +
             ":" +
             String(finishAtMins).padStart(2, "0") +
-            meridian}
+            meridiem}
           ({hours + "h " + minutes + "m"})
         </span>
       </div>
