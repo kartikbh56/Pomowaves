@@ -19,7 +19,6 @@ export default function TimerNavigation({
             type: "changeMode",
             mode: btn,
             status: "initial",
-            timerId: null,
           });
           dispatchCountdown({
             type: "setCountdown",

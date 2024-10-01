@@ -15,7 +15,6 @@ export default function Timer() {
   const {tasksState, dispatchTasks} = useContext(TasksContext)
 
   const {
-    timerId,
     status,
     mode,
     completedPomodoros,
@@ -23,23 +22,26 @@ export default function Timer() {
   } = timerState;
   
   const { secondsRemaining } = countdownState;
+  const timerIdRef = useRef(null)
   
   useEffect(() => {
-    timerId && clearTimeout(timerId);
     if (status === "started") {
-      const timerId = setInterval(() => {
+      timerIdRef.current = setInterval(() => {
         dispatchCountdown({ type: "countdown" });
       }, 1000);
-      dispatchTimerState({ type: "setTimerId", timerId: timerId });
-      return () => clearInterval(timerId);
+      return () => {
+        console.log("unmounted")
+        clearInterval(timerIdRef.current);
+      }
     } else if (status === "paused") {
-      clearInterval(timerId);
-      dispatchTimerState({ type: "setTimerId", timerId: null });
+      clearInterval(timerIdRef.current);
+      timerIdRef.current = null
     }
   }, [status]);
   useEffect(() => {
     if (secondsRemaining <= 0) {
-      // dispatch({ type: "finished" });
+      clearInterval(timerIdRef.current);
+      timerIdRef.current = null
       if (mode === "pomodoro") {
         const completedPomodoros = timerState.completedPomodoros + 1;
         const nextMode =
@@ -83,7 +85,6 @@ export default function Timer() {
           type: "finishedPomodoro",
           completedPomodoros: completedPomodoros,
           mode: nextMode,
-          timerId: null,
           timeFocused: timeFocused,
           status: "initial",
         });
@@ -102,7 +103,6 @@ export default function Timer() {
         dispatchTimerState({
           type: "finishedBreak",
           mode: nextMode,
-          timerId: null,
           status: "initial",
         });
       }
@@ -110,7 +110,6 @@ export default function Timer() {
         (completedPomodoros + 1) % timers.longBreakInterval === 0
           ? timers.longBreakInterval
           : (completedPomodoros + 1) % timers.longBreakInterval;
-      clearInterval(timerId);
       let id = setInterval(() => {
         new Audio("sounds/button.mp3").play();
       }, 200);

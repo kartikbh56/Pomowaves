@@ -18,7 +18,7 @@ const initialTimerState = {
   },
   autoStartPomodoros: false, // settings
   autoStartBreaks: false, // settings
-  timerId: null,
+  // timerId: null,
   status: "initial", // initial, started, paused, finished
   mode: "pomodoro", // pomodoro, shortBreak, longBreak
   completedPomodoros: 0,
@@ -103,7 +103,6 @@ function timerReducer(timerState, action) {
         ...timerState,
         completedPomodoros: action.completedPomodoros,
         mode: action.mode,
-        timerId: action.timerId,
         timeFocused: action.timeFocused,
         status: action.status,
       };
@@ -111,13 +110,7 @@ function timerReducer(timerState, action) {
       return {
         ...timerState,
         mode: action.mode,
-        timerId: action.timerId,
         status: action.status,
-      };
-    case "setTimerId":
-      return {
-        ...timerState,
-        timerId: action.timerId,
       };
     case "changeTimerSettings":
       return {
@@ -131,13 +124,7 @@ function timerReducer(timerState, action) {
         ...timerState,
         mode: action.mode,
         status: action.status,
-        timerId: action.timerId,
       };
-    // case "changeAutoStart":
-    //   return {
-    //     ...timerState,
-    //     [action.autoStart]: !timerState[action.autoStart],
-    //   };
   }
 }
 
