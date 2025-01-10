@@ -8,7 +8,7 @@ export default function SettingsContainer({ children, saveSettings }) {
     return (
       <div
         className="modalview"
-        onClick={saveSettings}
+        onClick={discardChanges}
         onKeyDown={(e) => e.key === "Enter" && saveSettings()}
       >
         <div className="settings-container" onClick={(e) => e.stopPropagation()}>

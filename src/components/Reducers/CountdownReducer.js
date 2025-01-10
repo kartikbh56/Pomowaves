@@ -6,11 +6,6 @@ export const initialCountdownState = {
 
 export function countdownReducer(countdownState, action) {
   switch (action.type) {
-    case "countdown":
-      return {
-        ...countdownState,
-        secondsRemaining: countdownState.secondsRemaining - 1,
-      };
     case "setCountdown":
       return {
         ...countdownState,

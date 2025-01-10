@@ -7,7 +7,7 @@ import {
 } from "../contexts/context";
 export default function StartButton({ firstClick }) {
   const {
-    timerState: { status, mode, autoStartBreaks, autoStartPomodoros },
+    timerState: { timers ,status, mode, autoStartBreaks, autoStartPomodoros },
     dispatchTimerState,
   } = useContext(TimerContext);
   const { tasksState, dispatchTasks } = useContext(TasksContext);
@@ -37,13 +37,18 @@ export default function StartButton({ firstClick }) {
 
   function handleClick() {
     firstClick.current = true;
+    
     status === "started"
-      ? dispatchTimerState({ type: "paused", startedAt: null, endsAt: null })
+      ? dispatchTimerState({
+          type: "paused",
+          secsCompletedAtPause: timers[mode]*60 - secondsRemaining,
+        })
       : dispatchTimerState({
           type: "started",
           startedAt: Date.now(),
           endsAt: Date.now() + secondsRemaining * 1000,
         });
+
     if (status === "initial" && mode === "pomodoro" && tasksState.currentTask)
       dispatchTasks({ type: "sortTasks" });
 

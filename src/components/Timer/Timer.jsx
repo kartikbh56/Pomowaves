@@ -22,48 +22,39 @@ export default function Timer() {
   const { status, mode, completedPomodoros, timers } = timerState;
 
   const { secondsRemaining } = countdownState;
+
   const timerIdRef = useRef(null);
+
+  function startTimer(seconds) {
+    timerIdRef.current = setInterval(() => {
+      const currentTime = Date.now();
+      const timeElapsed = Math.floor(
+        (currentTime - timerState.startedAt) / 1000
+      );
+      const secondsRemaining = seconds - timeElapsed;
+      dispatchCountdown({
+        type: "setCountdown",
+        secondsRemaining: secondsRemaining,
+      });
+    }, 1000);
+  }
 
   useEffect(() => {
     if (status === "started") {
-      // initial start of the timer
-      if (secondsRemaining === timerState.timers[mode] * 60) {
-        timerIdRef.current = setInterval(() => {
-          const currentTime = Date.now();
-          const timeElapsed = Math.floor(
-            (currentTime - timerState.startedAt) / 1000
-          );
-          const secondsRemaining = timerState.timers[mode] * 60 - timeElapsed;
-          dispatchCountdown({
-            type: "setCountdown",
-            secondsRemaining: secondsRemaining,
-          });
-        }, 1000);
-     // When you pause the timer and resume it
-      } else {
-        const pausedAt = secondsRemaining;
-        timerIdRef.current = setInterval(() => {
-          const currentTime = Date.now();
-          const timeElapsed = Math.floor(
-            (currentTime - timerState.startedAt) / 1000
-          );
-          const secondsRemaining = pausedAt - timeElapsed;
-          dispatchCountdown({
-            type: "setCountdown",
-            secondsRemaining: secondsRemaining,
-          });
-        }, 1000);
-      }
-
-      return () => {
-        console.log("clean up");
-        clearInterval(timerIdRef.current);
-      };
-    } else if (status === "paused") {
+      startTimer(secondsRemaining);
+    }
+    
+    else if (status === "paused") {
       clearInterval(timerIdRef.current);
       timerIdRef.current = null;
     }
-  }, [status]);
+
+    return () => {
+      console.log("clean up");
+      clearInterval(timerIdRef.current);
+    };
+
+  }, [status, timerState.timers[mode]]);
   useEffect(() => {
     if (secondsRemaining <= 0) {
       clearInterval(timerIdRef.current);

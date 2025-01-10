@@ -1,5 +1,9 @@
 import { useContext, useState } from "react";
-import { CountdownContext, IsOpenContext, TimerContext } from "../contexts/context";
+import {
+  CountdownContext,
+  IsOpenContext,
+  TimerContext,
+} from "../contexts/context";
 import SettingsContainer from "./SettingsContainer";
 import TimeSettings from "./TimeSettings";
 import AutoStartOptions from "./AutoStartOptions";
@@ -21,12 +25,18 @@ export default function Settings() {
   );
 
   function saveSettings() {
-    const secondsRemaining =
-      timerState.status === "started" || timerState.status === "paused"
+    let secondsRemaining =
+      timerState.status === "paused"
         ? userTimers[timerState.mode] * 60 -
           (timerState.timers[timerState.mode] * 60 -
             countdownState.secondsRemaining)
         : userTimers[timerState.mode] * 60;
+
+    if (timerState.secsCompletedAtPause && timerState.status === "started") {
+      secondsRemaining -= timerState.secsCompletedAtPause;
+      dispatchTimerState({ type: "clearPause", secsCompletedAtPause: 0 });
+    }
+    // console.log(secondsRemaining, "updated")
 
     dispatchIsOpen({ type: "toggleMenu", menu: "settings" });
 
