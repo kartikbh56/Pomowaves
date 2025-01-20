@@ -4,13 +4,24 @@ import {
   CountdownContext,
   TasksContext,
   TimerContext,
+  ReportsContext,
 } from "../contexts/context";
+
 export default function StartButton({ firstClick }) {
   const {
-    timerState: { timers ,status, mode, autoStartBreaks, autoStartPomodoros },
+    timerState: {
+      timers,
+      status,
+      mode,
+      autoStartBreaks,
+      autoStartPomodoros,
+      startedAt,
+    },
     dispatchTimerState,
   } = useContext(TimerContext);
   const { tasksState, dispatchTasks } = useContext(TasksContext);
+
+  const { dispatchReports } = useContext(ReportsContext);
 
   const {
     countdownState: { secondsRemaining },
@@ -36,18 +47,35 @@ export default function StartButton({ firstClick }) {
   }, [mode, autoStartBreaks, status, autoStartPomodoros, firstClick]);
 
   function handleClick() {
+    new Audio("sounds/finger-snap.mp3").play();
     firstClick.current = true;
-    
-    status === "started"
-      ? dispatchTimerState({
-          type: "paused",
-          secsCompletedAtPause: timers[mode]*60 - secondsRemaining,
-        })
-      : dispatchTimerState({
-          type: "started",
-          startedAt: Date.now(),
-          endsAt: Date.now() + secondsRemaining * 1000,
+
+    if (status === "started") {
+      dispatchTimerState({
+        type: "paused",
+        secsCompletedAtPause: timers[mode] * 60 - secondsRemaining,
+      });
+
+      const currentTaskName = tasksState.tasks.find(
+        (e) => e.id === tasksState.currentTask
+      )?.task;
+
+      if(Math.floor((Date.now() - startedAt)/(1000*60)) > 0){
+        dispatchReports({
+          type: "addReport",
+          id:crypto.randomUUID(),
+          taskId: tasksState.currentTask,
+          task: currentTaskName,
+          startedAt: startedAt,
+          endedAt: Date.now(),
         });
+      }
+    } else {
+      dispatchTimerState({
+        type: "started",
+        startedAt: Date.now(),
+      });
+    }
 
     if (status === "initial" && mode === "pomodoro" && tasksState.currentTask)
       dispatchTasks({ type: "sortTasks" });
@@ -70,7 +98,7 @@ export default function StartButton({ firstClick }) {
 
       dispatchTasks({ type: "sortTasks" });
     }
-    new Audio("sounds/finger-snap.mp3").play();
+    
   }
   const btnColor =
     mode === "pomodoro"

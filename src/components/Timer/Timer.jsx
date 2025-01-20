@@ -42,9 +42,7 @@ export default function Timer() {
   useEffect(() => {
     if (status === "started") {
       startTimer(secondsRemaining);
-    }
-    
-    else if (status === "paused") {
+    } else if (status === "paused") {
       clearInterval(timerIdRef.current);
       timerIdRef.current = null;
     }
@@ -53,7 +51,6 @@ export default function Timer() {
       console.log("clean up");
       clearInterval(timerIdRef.current);
     };
-
   }, [status, timerState.timers[mode]]);
   useEffect(() => {
     if (secondsRemaining <= 0) {
@@ -67,12 +64,6 @@ export default function Timer() {
             : "shortBreak";
         const secondsRemaining = timerState.timers[nextMode] * 60;
 
-        const timeFocused = {
-          hours: timerState.timeFocused.hours + timerState.timers.pomodoro / 60,
-          minutes:
-            timerState.timeFocused.minutes + (timerState.timers.pomodoro % 60),
-        };
-
         const newTasks = tasksState.tasks.map((task) =>
           task.id === tasksState.currentTask
             ? { ...task, completed: task.completed + 1 }
@@ -82,21 +73,17 @@ export default function Timer() {
         const currentTaskName = tasksState.tasks.find(
           (t) => t.id === tasksState.currentTask
         ).task;
-        const startedAt = timerState.startedAt;
-        const endsAt = timerState.endsAt;
-        const diff = endsAt - startedAt;
-        const currentTaskTimeFocused = {
-          hours: Math.floor(diff / (1000 * 60 * 60)),
-          minutes: Math.floor((diff / (1000 * 60)) % 60),
-        };
 
-        dispatchReports({
-          type: "pomodoroFinished",
-          task: currentTaskName,
-          timeFocused: currentTaskTimeFocused,
-          startedAt: timerState.startedAt,
-          endsAt: timerState.endsAt,
-        });
+        if (Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0) {
+          dispatchReports({
+            type: "pomodoroFinished",
+            id: crypto.randomUUID(),
+            taskId: tasksState.tasks.currentTask,
+            task: currentTaskName,
+            startedAt: timerState.startedAt,
+            endedAt: Date.now(),
+          });
+        }
 
         dispatchCountdown({
           type: "setCountdown",
@@ -107,7 +94,6 @@ export default function Timer() {
           type: "finishedPomodoro",
           completedPomodoros: completedPomodoros,
           mode: nextMode,
-          timeFocused: timeFocused,
           status: "initial",
         });
 

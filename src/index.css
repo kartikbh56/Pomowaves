@@ -7,6 +7,18 @@ body {
   font-weight: 400;
   color: white;
   transition: background-color 0.5s linear;
+  /* Centers the image */
+}
+
+
+.app {
+  border-radius: 5px;
+  padding: 15px;
+  max-width: 650px;
+  margin: auto;
+  /* background-color: #00000027; */
+  height: 100vh;
+  /* margin-bottom: 5px; */
 }
 
 button,
@@ -18,12 +30,6 @@ input {
 
 button {
   font-family: "Varela round";
-}
-
-.app {
-  padding: 10px;
-  max-width: 650px;
-  margin: auto;
 }
 
 header {
@@ -99,19 +105,20 @@ header {
 
 .timer {
   display: flex;
-  color:rgb(250, 243, 230);
+  color: rgb(250, 235, 208);
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 550px;
+  max-width: 600px;
+  height: 35vh;
   margin: auto;
   margin-top: 30px;
   margin-bottom: 30px;
   padding-top: 30px;
   padding-bottom: 40px;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.081);
+  background-color: rgba(31, 31, 31, 0.113);
 }
 
 .timernav {
@@ -123,12 +130,13 @@ header {
 .timernav button {
   background: none;
   border: none;
-  padding: 5px 10px;
-  color:rgb(250, 244, 232);
+  font-size: 1.5vh;
+  padding: 7px 10px;
+  color: rgb(250, 244, 232);
   letter-spacing: 0.2px;
   font-family: 'Varela Round';
   border-radius: 5px;
-  margin: auto 3px;
+  margin: auto 10px;
   transition: background-color 0.1s ease;
   cursor: pointer;
 }
@@ -141,6 +149,7 @@ header {
   align-items: center;
   justify-content: center;
   margin-top: 10px;
+  height: 20vh;
   margin-bottom: 10px;
 }
 
@@ -152,10 +161,10 @@ header {
   box-shadow: rgb(214, 214, 214) 0px 4px 0px;
   font-size: 22px;
   height: 55px;
-  color: rgb(186, 73, 73);
+  color: black;
   font-weight: bold;
   width: 200px;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   transition: color 0.5s ease-in-out 0s;
   font-family: 'Varela Round';
   letter-spacing: 1px;
@@ -450,7 +459,7 @@ header {
   padding: 5px;
 }
 
-.tasklist-options{
+.tasklist-options {
   border-radius: 4px;
   opacity: 1;
   padding: 4px 0px;
@@ -461,7 +470,7 @@ header {
   background-color: white;
   width: 210px;
   right: 0;
-  z-index:2;
+  z-index: 2;
   height: 100px;
 }
 
@@ -480,7 +489,7 @@ header {
   overflow: hidden;
   box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.1);
   position: relative;
-  transition: transform 0.1s linear;
+  transition: transform 0.1s ease-in-out;
 }
 
 .todo-item:hover {
@@ -523,7 +532,7 @@ header {
 
 .title {
   flex-grow: 1;
-  color: rgb(85, 85, 85);
+  color: rgb(80, 80, 80);
   z-index: 1;
 }
 
@@ -554,7 +563,7 @@ header {
   background-color: rgba(0, 0, 0, 0.275);
   margin-right: 10px;
   border-radius: 50%;
-  z-index: 1;
+  z-index: 2;
 }
 
 .right-mark::after {
@@ -576,7 +585,7 @@ header {
   left: 0;
   top: 0;
   height: 100%;
-  background-color: #ff000018;
+  background-color: #ff878747;
   transition: width 2s ease;
 }
 
@@ -591,7 +600,7 @@ header {
   box-sizing: border-box;
   font-weight: bold;
   outline: none;
-  font-family: 'Nunito';
+  font-family: 'Varela round';
 }
 
 .menu-container-header-input::placeholder {
@@ -765,7 +774,7 @@ header {
   border-radius: 15px;
   background-color: white;
   position: relative;
-  max-width: 480px;
+  max-width: 680px;
   width: 95%;
   border-top: 1px solid rgb(239, 239, 239);
   border-bottom: 1px solid rgb(239, 239, 239);
@@ -789,8 +798,9 @@ header {
   cursor: pointer;
   border: none;
   font-size: 14px;
+  font-weight: bold;
   background: none;
-  color: #373737;
+  color: #5a5a5a;
 }
 
 .tab.active {
@@ -802,7 +812,7 @@ header {
 
 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
@@ -844,11 +854,12 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-left: 10px;
 }
 
 .period-selector {
   display: flex;
+  margin-right: 15px;
   gap: 5px;
 }
 
@@ -866,8 +877,125 @@ header {
   color: white;
 }
 
-.summary-reports-icons{
+.summary-reports-icons {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.time-tracker {
+  width: 100%;
+  margin: 20px auto;
+  border-radius: 8px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.5fr 0.3fr;
+  justify-items: start;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  color: #888;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.entry {
+  display: grid;
+  justify-items: start;
+  grid-template-columns: 1.5fr 1fr 0.5fr 0.3fr;
+  padding: 10px;
+  border-bottom: 1px solid #f5f5f5;
+  align-items: center;
+}
+
+.date {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.time-range {
+  color: #999;
+  font-size: 0.75em;
+  margin-top: 4px;
+}
+
+.project-name {
+  font-weight: bold;
+  font-size: 15px;
+  color: rgb(112, 112, 112);
+}
+
+.minutes {
+  color: #595959;
+  font-size: 13px;
+}
+
+.delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.pagination button {
+  width: 30px;
+  height: 30px;
+  margin: 0 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 1px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination .page-number {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 0 10px;
+}
+
+.timeline-controller {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-bottom: 10px;
+  justify-content: space-around;
+  width: 200px;
+  border-radius: 10px;
+  padding: 5px 5px;
+}
+
+.timeline-controller button {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #e57373;
+  color:white;
+  cursor: pointer;
+  outline: none;
+  width: 28px;
+  height: 28px;
+}
+
+.timeline-controller span {
+  font-size: 14px;
+  font-weight: bold;
+  color: gray;
 }

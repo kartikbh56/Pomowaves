@@ -3,7 +3,7 @@
 import { useState, useContext, useReducer } from "react";
 import { IsOpenContext, ReportsContext } from "../contexts/context";
 import SummaryView from "./ReportsSummary/SummaryView";
-import Details from "./DetailReports/Details";
+import TimeLineDetails from "./DetailReports/Details";
 import Ranking from "./LeaderBoard/Ranking";
 import ReportsContainer from "./ReportsContainer";
 
@@ -12,25 +12,19 @@ export default function ReportsMenu() {
   const { dispatchIsOpen } = useContext(IsOpenContext);
   const closeModal = () =>
     dispatchIsOpen({ type: "toggleMenu", menu: "reports" });
-
   return (
-    <div className="modalview" onClick={closeModal}>
-      <ReportsContainer>
-        <img
-          className="close-button"
-          style={{ padding: "0px" }}
-          src="icons/close.png"
-          onClick={closeModal}
-        />
-        <ReportsTabs
-          setCurrentView={setCurrentView}
-          currentView={currentView}
-        />
-        {currentView === "Summary" && <SummaryView />}
-        {currentView === "Details" && <Details />}
-        {currentView === "Ranking" && <Ranking />}
-      </ReportsContainer>
-    </div>
+    <ReportsContainer>
+      <img
+        className="close-button"
+        style={{ padding: "0px" }}
+        src="icons/close.png"
+        onClick={closeModal}
+      />
+      <ReportsTabs setCurrentView={setCurrentView} currentView={currentView} />
+      {currentView === "Summary" && <SummaryView />}
+      {currentView === "Details" && <TimeLineDetails />}
+      {currentView === "Ranking" && <Ranking />}
+    </ReportsContainer>
   );
 }
 

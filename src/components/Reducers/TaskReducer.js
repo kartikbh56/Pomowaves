@@ -12,36 +12,6 @@ export const initialTasksState = {
       estimated: 5,
       completed: 4,
     },
-    // {
-    //   id: 3,
-    //   task: "Project",
-    //   estimated: 4,
-    //   completed: 2,
-    // },
-    // {
-    //   id: 4,
-    //   task: "randomTask",
-    //   estimated: 6,
-    //   completed: 1,
-    // },
-    // {
-    //   id: 5,
-    //   task: "Random Task 3",
-    //   estimated: 4,
-    //   completed: 3,
-    // },
-    // {
-    //   id: 6,
-    //   task: "Random Task 4",
-    //   estimated: 4,
-    //   completed: 2,
-    // },
-    // {
-    //   id: 7,
-    //   task: "Random Task 5",
-    //   estimated: 4,
-    //   completed: 1,
-    // },
   ],
   currentTask: 1,
 };

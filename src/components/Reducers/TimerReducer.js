@@ -12,9 +12,7 @@ export const initialTimerState = {
   mode: "pomodoro", // pomodoro, shortBreak, longBreak
   completedPomodoros: 0,
   startedAt: null,
-  endsAt: null,
   secsCompletedAtPause: 0,
-  timeFocused: { hours: 0, minutes: 0 },
 };
 
 export function timerReducer(timerState, action) {
@@ -24,14 +22,12 @@ export function timerReducer(timerState, action) {
         ...timerState,
         status: "started",
         startedAt: action.startedAt,
-        endsAt: action.endsAt,
       };
     case "paused":
       return {
         ...timerState,
         status: "paused",
         startedAt: null,
-        endsAt: null,
         secsCompletedAtPause: action.secsCompletedAtPause,
       };
     case "finishedPomodoro":
@@ -39,10 +35,8 @@ export function timerReducer(timerState, action) {
         ...timerState,
         completedPomodoros: action.completedPomodoros,
         mode: action.mode,
-        timeFocused: action.timeFocused,
         status: action.status,
         startedAt: action.startedAt,
-        endsAt: action.endsAt,
       };
     case "finishedBreak":
       return {
@@ -50,7 +44,6 @@ export function timerReducer(timerState, action) {
         mode: action.mode,
         status: action.status,
         startedAt: action.startedAt,
-        endsAt: action.endsAt,
       };
     case "changeTimerSettings":
       return {
@@ -70,7 +63,6 @@ export function timerReducer(timerState, action) {
         mode: action.mode,
         status: action.status,
         startedAt: action.startedAt,
-        endsAt: action.endsAt,
       };
   }
 }
