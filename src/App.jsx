@@ -1,11 +1,13 @@
-import { useReducer } from "react";
+import { useReducer, useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Settings from "./components/Settings/Settings.jsx";
 import Tasks from "./components/Tasks/Tasks.jsx";
 import Summary from "./components/Summary.jsx";
 import Timer from "./components/Timer/Timer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Reports from "./components/Reports/ReportsMenu.jsx";
-
+import Auth from "./components/Auth/Auth.jsx";
+import Loader from "./components/Loader.jsx";
 import {
   TimerContext,
   TasksContext,
@@ -39,6 +41,8 @@ import {
   initialReports,
 } from "./components/Reducers/ReportsReducer.js";
 
+import { getCurrentUser } from "./lib/appwrite";
+
 function App() {
   const [timerState, dispatchTimerState] = useReducer(
     timerReducer,
@@ -62,29 +66,59 @@ function App() {
     initialReports
   );
 
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
-    <div className="app">
-      <TimerContext.Provider value={{ timerState, dispatchTimerState }}>
-        <TasksContext.Provider value={{ tasksState, dispatchTasks }}>
-          <IsOpenContext.Provider value={{ isOpenState, dispatchIsOpen }}>
-            <Navbar />
-            <CountdownContext.Provider
-              value={{ countdownState, dispatchCountdown }}
-            >
-              <ReportsContext.Provider
-                value={{ reportsState, dispatchReports }}
-              >
-                {isOpenState.settings && <Settings />}
-                {isOpenState.reports && <Reports />}
-                <Timer />
-              </ReportsContext.Provider>
-            </CountdownContext.Provider>
-          </IsOpenContext.Provider>
-          <Tasks />
-          {tasksState.tasks.length > 0 && <Summary />}
-        </TasksContext.Provider>
-      </TimerContext.Provider>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route
+          path="/*"
+          element={
+            user ? (
+              <div className="app">
+                <TimerContext.Provider value={{ timerState, dispatchTimerState }}>
+                  <TasksContext.Provider value={{ tasksState, dispatchTasks }}>
+                    <IsOpenContext.Provider value={{ isOpenState, dispatchIsOpen }}>
+                      <Navbar user={user} />
+                      <CountdownContext.Provider
+                        value={{ countdownState, dispatchCountdown }}
+                      >
+                        <ReportsContext.Provider
+                          value={{ reportsState, dispatchReports }}
+                        >
+                          {isOpenState.settings && <Settings />}
+                          {isOpenState.reports && <Reports />}
+                          <Timer />
+                          <Tasks />
+                          {tasksState.tasks.length > 0 && <Summary />}
+                        </ReportsContext.Provider>
+                      </CountdownContext.Provider>
+                    </IsOpenContext.Provider>
+                  </TasksContext.Provider>
+                </TimerContext.Provider>
+              </div>
+            ) : (
+              <Navigate to="/auth" replace />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 
