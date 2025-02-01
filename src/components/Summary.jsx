@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { TasksContext,TimerContext } from "./contexts/context";
+import { TasksContext,TimerContext } from "../contexts/context";
 
 /* eslint-disable react/prop-types */
 export default function Summary() {

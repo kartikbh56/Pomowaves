@@ -1,12 +1,17 @@
 import { useReducer, useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Settings from "./components/Settings/Settings.jsx";
 import Tasks from "./components/Tasks/Tasks.jsx";
 import Summary from "./components/Summary.jsx";
 import Timer from "./components/Timer/Timer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Reports from "./components/Reports/ReportsMenu.jsx";
-import Auth from "./components/Auth/Auth.jsx";
+import Auth from "./components/Auth.jsx";
 import Loader from "./components/Loader.jsx";
 import {
   TimerContext,
@@ -14,34 +19,23 @@ import {
   IsOpenContext,
   CountdownContext,
   ReportsContext,
-} from "./components/contexts/context.js";
+} from "./contexts/context.js";
 
-import {
-  initialTimerState,
-  timerReducer,
-} from "./components/Reducers/TimerReducer.js";
+import { initialTimerState, timerReducer } from "./Reducers/TimerReducer.js";
 
-import {
-  initialTasksState,
-  tasksReducer,
-} from "./components/Reducers/TaskReducer.js";
+import { tasksReducer, initialTasksState } from "./Reducers/TaskReducer.js";
 
 import {
   initialCountdownState,
   countdownReducer,
-} from "./components/Reducers/CountdownReducer.js";
+} from "./Reducers/CountdownReducer.js";
 
-import {
-  isOpenReducer,
-  initialIsOpenState,
-} from "./components/Reducers/IsOpenReducer.js";
+import { isOpenReducer, initialIsOpenState } from "./Reducers/IsOpenReducer.js";
 
-import {
-  reportsReducer,
-  initialReports,
-} from "./components/Reducers/ReportsReducer.js";
+import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
 
-import { getCurrentUser } from "./lib/appwrite";
+import { getCurrentUser } from "./api/auth.js";
+import { fetchTasks } from "./api/db.js";
 
 function App() {
   const [timerState, dispatchTimerState] = useReducer(
@@ -72,11 +66,14 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       const currentUser = await getCurrentUser();
+      console.log("currentUser", currentUser);
       setUser(currentUser);
       setLoading(false);
+      fetchTasks(currentUser.$id);
     };
     checkAuth();
   }, []);
+  
 
   if (loading) {
     return <Loader />;
@@ -91,9 +88,13 @@ function App() {
           element={
             user ? (
               <div className="app">
-                <TimerContext.Provider value={{ timerState, dispatchTimerState }}>
+                <TimerContext.Provider
+                  value={{ timerState, dispatchTimerState }}
+                >
                   <TasksContext.Provider value={{ tasksState, dispatchTasks }}>
-                    <IsOpenContext.Provider value={{ isOpenState, dispatchIsOpen }}>
+                    <IsOpenContext.Provider
+                      value={{ isOpenState, dispatchIsOpen }}
+                    >
                       <Navbar user={user} />
                       <CountdownContext.Provider
                         value={{ countdownState, dispatchCountdown }}

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { TimerContext,CountdownContext } from "../contexts/context";
+import { TimerContext,CountdownContext } from "../../contexts/context";
 import { useEffect, useContext } from "react";
 export default function TimerNavigation({
     firstClick,

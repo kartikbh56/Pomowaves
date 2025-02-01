@@ -1,79 +1,119 @@
-import { useContext, useState } from "react";
-import { IsOpenContext } from "./contexts/context";
-import { useNavigate } from "react-router-dom";
-import { logout } from "../lib/appwrite";
-import { useEffect } from "react";
-import "./UserDropdown.css";
-import { fetchGoogleProfile } from "../lib/appwrite";
-
 /* eslint-disable react/prop-types */
+import { useContext, useState, useEffect, useRef } from "react";
+import { IsOpenContext } from "../contexts/context";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../api/auth";
+
+function Logo() {
+  return (
+    <div className="logo">
+      <img src="icons/logo.png" alt="Pomofocus Logo" className="logo-img" />
+      <span>PomoWaves</span>
+    </div>
+  );
+}
+
+function MenuButton({ icon, label, onClick }) {
+  return (
+    <button className="btn" onClick={onClick}>
+      <img src={icon} alt={`${label} Icon`} />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
+  return (
+    isDropdownOpen && (
+      <div className="user-dropdown" ref={dropdownRef}>
+        <div className="dropdown-menu open">
+          <div className="user-info">{user?.name || "User"}</div>
+          <div className="user-info">{user?.email || "User"}</div>
+          <button id="logout-button" onClick={onLogout}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src="icons/enter.png" alt="Logout Icon" />
+              <span>Logout</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    )
+  );
+}
+
 export default function Navbar({ user }) {
   const { dispatchIsOpen } = useContext(IsOpenContext);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [userAvatar, setUserAvatar] = useState("");
-  useEffect(() => {
-    fetchGoogleProfile().then((picture) => {
-      setUserAvatar(picture);
-    });
-  }, []);
   const navigate = useNavigate();
 
-  function handleToggleReports() {
-    dispatchIsOpen({ type: "toggleMenu", menu: "reports" });
-  }
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  function handleToggleSettings() {
-    dispatchIsOpen({ type: "toggleMenu", menu: "settings" });
-  }
+  const handleToggleMenu = (menu) => {
+    dispatchIsOpen({ type: "toggleMenu", menu });
+  };
 
-  function handleToggleDropdown() {
-    setIsDropdownOpen(!isDropdownOpen);
-  }
+  const handleToggleDropdown = () => {
+    setIsDropdownOpen((prevState) => !prevState);
+  };
 
-  async function handleLogout() {
+  const handleLogout = async () => {
     try {
       await logout();
       navigate("/auth");
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  }
-  console.log(user);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header>
-      <div className="logo">
-        <img src="icons/logo.png" alt="Pomofocus Logo" className="logo-img" />
-        <span>PomoWaves</span>
-      </div>
+      <Logo />
 
       <div className="buttons">
-        <button className="btn" onClick={handleToggleReports}>
-          <img src="icons/report.png" />
-          <span>Report</span>
-        </button>
+        <MenuButton
+          icon="icons/report.png"
+          label="Report"
+          onClick={() => handleToggleMenu("reports")}
+        />
 
-        <button className="btn" onClick={handleToggleSettings}>
-          <img src="icons/settings.png" />
-          <span>Setting</span>
-        </button>
+        <MenuButton
+          icon="icons/settings.png"
+          label="Setting"
+          onClick={() => handleToggleMenu("settings")}
+        />
 
         <button className="btn" onClick={handleToggleDropdown}>
-          {userAvatar && <img src={userAvatar} style={{ borderRadius: "15px", width:"20px",height:"20px" }} />}
+            <img
+              src="/icons/user.png"
+              alt="User Avatar"
+              style={{ borderRadius: "15px", width: "20px", height: "20px" }}
+            />
           <span>{user.name}</span>
         </button>
-        <div className="user-dropdown">
-          <div className={`dropdown-menu ${isDropdownOpen ? "open" : ""}`}>
-            <div className="user-info">{user?.name || "User"}</div>
-            <div className="user-info">{user?.email || "User"}</div>
-            <button id="logout-button" onClick={handleLogout}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <img src={"icons/enter.png"} />
-                Logout
-              </div>
-            </button>
-          </div>
-        </div>
+
+        <UserDropdown
+          user={user}
+          isDropdownOpen={isDropdownOpen}
+          onLogout={handleLogout}
+          dropdownRef={dropdownRef} // Pass the ref to the dropdown
+        />
       </div>
     </header>
   );

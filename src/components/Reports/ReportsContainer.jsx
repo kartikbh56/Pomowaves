@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useContext } from "react";
-import { IsOpenContext } from "../contexts/context";
+import { IsOpenContext } from "../../contexts/context";
 export default function ReportsContainer({ children }) {
   const { dispatchIsOpen } = useContext(IsOpenContext);
   const closeModal = () =>

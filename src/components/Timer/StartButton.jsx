@@ -5,7 +5,7 @@ import {
   TasksContext,
   TimerContext,
   ReportsContext,
-} from "../contexts/context";
+} from "../../contexts/context";
 
 export default function StartButton({ firstClick }) {
   const {
@@ -84,7 +84,7 @@ export default function StartButton({ firstClick }) {
       ? tasksState.tasks.find((t) => t.id === tasksState.currentTask)
       : tasksState.currentTask;
 
-    if (currentTask.completed >= currentTask.estimated && mode === "pomodoro") {
+    if (currentTask?.completed >= currentTask?.estimated && mode === "pomodoro") {
       const newTasks = tasksState.tasks.map((task) =>
         task.id === currentTask.id
           ? { ...task, estimated: task.estimated + 1 }

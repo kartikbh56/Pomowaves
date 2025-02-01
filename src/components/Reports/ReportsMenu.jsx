@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState, useContext, useReducer } from "react";
-import { IsOpenContext, ReportsContext } from "../contexts/context";
+import { IsOpenContext, ReportsContext } from "../../contexts/context";
 import SummaryView from "./ReportsSummary/SummaryView";
 import TimeLineDetails from "./DetailReports/Details";
 import Ranking from "./LeaderBoard/Ranking";

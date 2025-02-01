@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState,useContext } from "react";
-import { TasksContext } from "../contexts/context";
+import { TasksContext } from "../../contexts/context";
 export default function TodoItemSettings({ toggleOptions, todo }) {
     const [options, setOptions] = useState({
       taskTitle: todo.task,

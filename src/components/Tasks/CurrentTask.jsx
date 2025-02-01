@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { TimerContext, TasksContext } from "../contexts/context";
+import { TimerContext, TasksContext } from "../../contexts/context";
 export default function CurrentTask() {
   const {
     tasksState: { tasks, currentTask }

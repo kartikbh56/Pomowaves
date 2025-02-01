@@ -3,7 +3,7 @@ import {
   CountdownContext,
   IsOpenContext,
   TimerContext,
-} from "../contexts/context";
+} from "../../contexts/context";
 import SettingsContainer from "./SettingsContainer";
 import TimeSettings from "./TimeSettings";
 import AutoStartOptions from "./AutoStartOptions";

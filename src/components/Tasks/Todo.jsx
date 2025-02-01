@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useContext } from "react";
-import { TasksContext } from "../contexts/context";
+import { TasksContext } from "../../contexts/context";
 export default function Todo({ todo, handleClick, toggleOptions }) {
     const {
       tasksState: { currentTask },

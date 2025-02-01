@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState } from "react";
 import TaskMenu from "./TaskMenu";
-import { TasksContext } from "../contexts/context";
+import { TasksContext } from "../../contexts/context";
 import Progress from "../Progress";
 export default function TaskList() {
   const {

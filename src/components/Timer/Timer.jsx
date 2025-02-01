@@ -8,7 +8,7 @@ import {
   ReportsContext,
   TasksContext,
   TimerContext,
-} from "../contexts/context";
+} from "../../contexts/context";
 import TimerNavigation from "./TimerNavigation";
 import Time from "./Time";
 import StartButton from "./StartButton";
@@ -70,9 +70,9 @@ export default function Timer() {
             : task
         );
 
-        const currentTaskName = tasksState.tasks.find(
+        const currentTaskName = tasksState.tasks?.find(
           (t) => t.id === tasksState.currentTask
-        ).task;
+        )?.task;
 
         if (Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0) {
           dispatchReports({

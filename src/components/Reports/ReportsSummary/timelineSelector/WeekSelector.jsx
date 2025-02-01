@@ -13,7 +13,7 @@ export default function WeekPicker() {
   const lastDayOfTheWeek = new Date();
   lastDayOfTheWeek.setDate(firstDayOfTheWeek.getDate() + 6);
 
-  console.log({ dayOfTheWeek, firstDayOfTheWeek, lastDayOfTheWeek });
+  // console.log({ dayOfTheWeek, firstDayOfTheWeek, lastDayOfTheWeek });
 
   const handlePrevWeek = () => {
     const newDate = new Date(dayOfTheWeek)

@@ -1,17 +1,5 @@
 export const initialTasksState = {
   tasks: [
-    {
-      id: 1,
-      task: "React.js",
-      estimated: 5,
-      completed: 4,
-    },
-    {
-      id: 2,
-      task: "Academics",
-      estimated: 5,
-      completed: 4,
-    },
   ],
   currentTask: 1,
 };
