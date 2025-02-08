@@ -35,7 +35,6 @@ import { isOpenReducer, initialIsOpenState } from "./Reducers/IsOpenReducer.js";
 import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
 
 import { getCurrentUser } from "./api/auth.js";
-import { fetchTasks } from "./api/db.js";
 
 function App() {
   const [timerState, dispatchTimerState] = useReducer(
@@ -69,7 +68,6 @@ function App() {
       console.log("currentUser", currentUser);
       setUser(currentUser);
       setLoading(false);
-      fetchTasks(currentUser.$id);
     };
     checkAuth();
   }, []);

@@ -3,8 +3,6 @@ import { useState } from "react";
 import { useContext } from "react";
 import { ReportsContext } from "../../../contexts/context";
 
-
-// at the top of this component you need to have a filtering functionality for users to filter through the date at which the tasks to be fetched
 const TimeTracker = () => {
   const {
     reportsState: { timeLine },
@@ -34,33 +32,39 @@ const TimeTracker = () => {
 
   return (
     <div className="time-tracker">
-      <div className="header">
-        <div>DATE</div>
-        <div>TASK</div>
-        <div>MINUTES</div>
-        <div></div>
-      </div>
-      {currentEntries.map((entry) => (
-        <TimeEntry
-          key={entry.id}
-          entry={entry}
-          onDelete={() => handleDelete(entry.id)}
-        />
-      ))}
-      {totalPages > 1 && (
-        <div className="pagination">
-          {currentPage > 1 && (
-            <button className="prev up-down-btn" onClick={handlePrevious}>
-              <img className="img" src="icons/left-arrow.png" alt="next" />
-            </button>
+      {timeLine.length > 0 ? (
+        <>
+          <div className="header">
+            <div>DATE</div>
+            <div>TASK</div>
+            <div>MINUTES</div>
+            <div></div>
+          </div>
+          {currentEntries.map((entry) => (
+            <TimeEntry
+              key={entry.id}
+              entry={entry}
+              onDelete={() => handleDelete(entry.id)}
+            />
+          ))}
+          {totalPages > 1 && (
+            <div className="pagination">
+              {currentPage > 1 && (
+                <button className="prev up-down-btn" onClick={handlePrevious}>
+                  <img className="img" src="icons/left-arrow.png" alt="next" />
+                </button>
+              )}
+              <span className="page-number">{currentPage}</span>
+              {currentPage !== totalPages && (
+                <button className="next up-down-btn" onClick={handleNext}>
+                  <img className="img" src="icons/right-arrow.png" alt="next" />
+                </button>
+              )}
+            </div>
           )}
-          <span className="page-number">{currentPage}</span>
-          {currentPage !== totalPages && (
-            <button className="next up-down-btn" onClick={handleNext}>
-              <img className="img" src="icons/right-arrow.png" alt="next" />
-            </button>
-          )}
-        </div>
+        </>
+      ) : (
+        <div className="placeholder">No records</div>
       )}
     </div>
   );
@@ -109,7 +113,7 @@ const Trash2 = () => (
     viewBox="0 0 24 24"
     width="24"
     height="24"
-    stroke="#808080" // Grey color
+    stroke="grey"
     strokeWidth="2"
     fill="none"
     strokeLinecap="round"

@@ -1,16 +1,27 @@
 export const initialTasksState = {
-  tasks: [
-  ],
-  currentTask: 1,
+  tasks: [],
+  currentTask: null,
+  currentTaskDocumentID : null // for db
 };
 
 export function tasksReducer(tasksState, action) {
   switch (action.type) {
+    case "fetchTasks": // initial fetching from DB
+      return {
+        ...tasksState,
+        tasks: action.tasks,
+      };
+    case "fetchCurrentTask":
+      return {
+        ...tasksState,
+        currentTask: action.currentTask,
+        currentTaskDocumentID:action.currentTaskDocumentID
+      };
     case "sortTasks":
       return {
         ...tasksState,
         tasks: tasksState.tasks.slice().sort((a, b) => {
-          // sorting the tasks in such a way that, completed tasks stay at the bottom and current task at the top
+          // sorting the tasks in such a way that, completed tasks stay at the bottom and current task at the top of the list
           if (a.id === tasksState.currentTask) return -1;
           if (b.id === tasksState.currentTask) return 1;
           if (a.completed >= a.estimated && b.completed < b.estimated) return 1;
@@ -21,6 +32,7 @@ export function tasksReducer(tasksState, action) {
       };
     case "setTasks":
       return {
+        ...tasksState,
         tasks: action.tasks || tasksState.tasks,
         currentTask: action.currentTask || tasksState.currentTask,
       };
@@ -39,10 +51,7 @@ export function tasksReducer(tasksState, action) {
       return {
         ...tasksState,
         tasks: [...tasksState.tasks, action.newTask],
-        currentTask:
-          tasksState.tasks.length === 0
-            ? action.newTask.id
-            : tasksState.currentTask,
+        currentTask: action.currentTask || tasksState.currentTask
       };
     case "deleteTask":
       return {

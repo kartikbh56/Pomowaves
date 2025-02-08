@@ -138,7 +138,7 @@ header {
 }
 
 .time {
-  font-size: 125px;
+  font-size: 120px;
   font-weight: 900;
   margin: auto;
   display: flex;
@@ -276,17 +276,17 @@ header {
 
 .settings-header {
   font-size: 20px;
-  padding: 15px;
-  font-weight: bold;
-  text-align: center;
-  border-bottom: 1px solid rgb(223, 223, 223);
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid rgb(243 243 243);
+    letter-spacing: 1px;
 }
 
 .settings-footer {
-  padding: 10px 10px;
+  padding: 10px;
   text-align: center;
   width: 100%;
-  margin-top: 10px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
@@ -303,10 +303,10 @@ header {
   color: white;
   font-size: 14px;
   padding: 8px 12px;
-  background-color: rgb(55, 55, 55);
-  border: 2px solid rgb(55, 55, 55);
+  background-color: #3d3d3d;
+  border: none;
   display: inline-block;
-  width: 90%;
+  width: 30%;
   font-family: 'Varela Round';
 }
 
@@ -426,7 +426,7 @@ header {
 }
 
 .checkbox:checked+.switch {
-  background-color: #34C759;
+  background-color: #e57373;
 }
 
 .checkbox:checked+.switch .slider {
@@ -897,7 +897,7 @@ header {
 
 .time-tracker {
   width: 100%;
-  margin: 20px auto;
+  margin: auto;
   border-radius: 8px;
 }
 
@@ -907,8 +907,8 @@ header {
   justify-items: start;
   padding: 12px 16px;
   border-bottom: 1px solid #eee;
-  color: #888;
-  font-weight: bold;
+  color: #5f5f5f;
+  font-weight: bolder;
   font-size: 0.9em;
 }
 
@@ -933,7 +933,7 @@ header {
 }
 
 .project-name {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 15px;
   color: rgb(112, 112, 112);
 }
@@ -953,7 +953,8 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  /* padding: 10px; */
+  padding-top: 20px;
 }
 
 .pagination button {

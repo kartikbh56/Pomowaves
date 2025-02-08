@@ -2,21 +2,53 @@
 import { TasksContext } from "../../contexts/context";
 import { useContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { addCurrentTask, addTask, updateCurrentTask } from "../../api/db";
 // import { addTask } from "../../lib/appwrite";
 
 export default function AddTaskMenu({ setAddOption }) {
-  const { dispatchTasks } = useContext(TasksContext);
-  const [newTask, setNewTask] = useState({ task: "", estimated: 1 });
+  const {
+    tasksState: { tasks, currentTaskDocumentID },
+    dispatchTasks,
+  } = useContext(TasksContext);
+  const [newTaskInputFields, setNewTaskInputFields] = useState({
+    task: "",
+    estimated: 1,
+  });
   function saveSettings() {
-    newTask.task &&
+    if (newTaskInputFields.task) {
+      const newTask = { ...newTaskInputFields, completed: 0, id: uuidv4() };
+
+      if (tasks.length === 0) {
+        // if the task list is empty, then the current task will be the one which gets added now
+
+        dispatchTasks({ type: "switchTask", id: newTask.id }); // first task added when there were no tasks, will be the currentTask
+        if (!currentTaskDocumentID) {
+          // if there's no document in the collection for currentTask (for the users using this app for the first time)
+          // add the currentTask document in the collection (currentTask document contains the id of one of the tasks in the task list which is marked as current task)
+          // and then update the currentTask, and the created document's id for further update operations on currentTask
+          addCurrentTask(newTask.id).then((newCurrentTask) => {
+            console.log("newCurrentTask", newCurrentTask);
+            dispatchTasks({
+              type: "fetchCurrentTask",
+              currentTask: newCurrentTask?.currentTaskId,
+              currentTaskDocumentID: newCurrentTask?.$id,
+            });
+          });
+
+          // if currentTaskDocumentID already exists (fetched), then update it with the taskId of the task added just now.
+        } else 
+        updateCurrentTask(currentTaskDocumentID, newTask.id);
+      }
+
       dispatchTasks({
         type: "addTask",
-        newTask: { ...newTask, completed: 0, id: uuidv4() },
+        newTask: newTask,
       });
+      //db
+      addTask(newTask, newTask.id);
+    }
 
-    //db
-    // addTask(newTask);
-    setNewTask({ task: "", estimated: 1 });
+    setNewTaskInputFields({ task: "", estimated: 1 }); // input fields states
   }
   return (
     <div
@@ -27,23 +59,31 @@ export default function AddTaskMenu({ setAddOption }) {
         className="menu-container-header-input"
         placeholder="What are you working on?"
         autoFocus={true}
-        value={newTask.task}
-        onChange={(e) => setNewTask({ ...newTask, task: e.target.value })}
+        value={newTaskInputFields.task}
+        onChange={(e) =>
+          setNewTaskInputFields({ ...newTaskInputFields, task: e.target.value })
+        }
       />
       <div className="todo-label">Estimated Pomodoros</div>
       <input
         className="task-settings-input"
         type="number"
-        value={newTask.estimated}
+        value={newTaskInputFields.estimated}
         min={1}
         onChange={(e) =>
-          setNewTask({ ...newTask, estimated: Number(e.target.value) })
+          setNewTaskInputFields({
+            ...newTaskInputFields,
+            estimated: Number(e.target.value),
+          })
         }
       />
       <button
         className="up-down-btn"
         onClick={() =>
-          setNewTask({ ...newTask, estimated: newTask.estimated + 1 })
+          setNewTaskInputFields({
+            ...newTaskInputFields,
+            estimated: newTaskInputFields.estimated + 1,
+          })
         }
       >
         <img src="icons/caret-up.png" />
@@ -51,10 +91,12 @@ export default function AddTaskMenu({ setAddOption }) {
       <button
         className="up-down-btn"
         onClick={() =>
-          setNewTask({
-            ...newTask,
+          setNewTaskInputFields({
+            ...newTaskInputFields,
             estimated:
-              newTask.estimated - 1 >= 1 ? Number(newTask.estimated - 1) : 1,
+              newTaskInputFields.estimated - 1 >= 1
+                ? Number(newTaskInputFields.estimated - 1)
+                : 1,
           })
         }
       >

@@ -12,6 +12,7 @@ import {
 import TimerNavigation from "./TimerNavigation";
 import Time from "./Time";
 import StartButton from "./StartButton";
+import { updateCurrentTask, updateTask } from "../../api/db";
 
 export default function Timer() {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
@@ -70,9 +71,11 @@ export default function Timer() {
             : task
         );
 
-        const currentTaskName = tasksState.tasks?.find(
+        const currentTask = tasksState.tasks?.find(
           (t) => t.id === tasksState.currentTask
-        )?.task;
+        );
+
+        const currentTaskName = currentTask?.task;
 
         if (Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0) {
           dispatchReports({
@@ -101,9 +104,14 @@ export default function Timer() {
           type: "setTasks",
           tasks: newTasks,
         });
+
+        updateTask(tasksState.currentTask, {
+          completed: currentTask.completed + 1,
+        });
+
       } else {
-        const secondsRemaining = timerState.timers.pomodoro * 60;
         const nextMode = "pomodoro";
+        const secondsRemaining = timerState.timers[nextMode] * 60;
         const currentTask =
           tasksState.currentTask &&
           tasksState.tasks.find((t) => t.id === tasksState.currentTask);
@@ -128,6 +136,7 @@ export default function Timer() {
           type: "setTasks",
           currentTask: nextTask,
         });
+        updateCurrentTask(tasksState.currentTaskDocumentID, nextTask || currentTask.id)
       }
       let bellRings =
         (completedPomodoros + 1) % timers.longBreakInterval === 0

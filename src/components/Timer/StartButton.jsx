@@ -6,6 +6,7 @@ import {
   TimerContext,
   ReportsContext,
 } from "../../contexts/context";
+import { updateTask } from "../../api/db";
 
 export default function StartButton({ firstClick }) {
   const {
@@ -60,10 +61,10 @@ export default function StartButton({ firstClick }) {
         (e) => e.id === tasksState.currentTask
       )?.task;
 
-      if(Math.floor((Date.now() - startedAt)/(1000*60)) > 0){
+      if (Math.floor((Date.now() - startedAt) / (1000 * 60)) > 0) {
         dispatchReports({
           type: "addReport",
-          id:crypto.randomUUID(),
+          id: crypto.randomUUID(),
           taskId: tasksState.currentTask,
           task: currentTaskName,
           startedAt: startedAt,
@@ -82,9 +83,12 @@ export default function StartButton({ firstClick }) {
 
     const currentTask = tasksState.currentTask
       ? tasksState.tasks.find((t) => t.id === tasksState.currentTask)
-      : tasksState.currentTask;
+      : tasksState.tasks[0];
 
-    if (currentTask?.completed >= currentTask?.estimated && mode === "pomodoro") {
+    if (
+      currentTask?.completed >= currentTask?.estimated &&
+      mode === "pomodoro"
+    ) {
       const newTasks = tasksState.tasks.map((task) =>
         task.id === currentTask.id
           ? { ...task, estimated: task.estimated + 1 }
@@ -95,10 +99,10 @@ export default function StartButton({ firstClick }) {
         tasks: newTasks,
         currentTask: currentTask.id,
       });
+      updateTask(currentTask.id, { estimated: currentTask.estimated + 1 });
 
       dispatchTasks({ type: "sortTasks" });
     }
-    
   }
   const btnColor =
     mode === "pomodoro"
