@@ -1,10 +1,13 @@
 /* eslint-disable react/prop-types */
+import { updateTimerSettings } from "../../api/db";
 import { TimerContext,CountdownContext } from "../../contexts/context";
 import { useEffect, useContext } from "react";
 export default function TimerNavigation({
     firstClick,
   }) {
-    const {timerState:{timers,mode},dispatchTimerState} = useContext(TimerContext)
+    const {timerState,dispatchTimerState} = useContext(TimerContext)
+    const {$id:timerSettingsDocumentId} = timerState
+    const {mode} = timerState
     const {dispatchCountdown} = useContext(CountdownContext)
     const selected = {
       fontWeight: "bold",
@@ -20,10 +23,23 @@ export default function TimerNavigation({
             mode: btn,
             status: "initial",
           });
+          //db
+          updateTimerSettings(timerSettingsDocumentId,{mode:btn,status:"initial"})
+
           dispatchCountdown({
             type: "setCountdown",
-            secondsRemaining: timers[btn] * 60,
+            secondsRemaining: timerState[btn] * 60,
           });
+
+        //   dispatchReports({
+        //   type: "addReport",
+        //   id: crypto.randomUUID(),
+        //   taskId: tasksState.currentTask,
+        //   task: currentTaskName,
+        //   startedAt: startedAt,
+        //   endedAt: Date.now(),
+        // });
+
           firstClick.current = false;
         }}
       >
@@ -34,7 +50,7 @@ export default function TimerNavigation({
     ));
     useEffect(() => {
       let backgroundColor;
-      if (mode === "pomodoro") backgroundColor = "#ba4a49";
+      if (mode === "pomodoro") backgroundColor = "rgb(186, 74, 73)";
       if (mode === "shortBreak") backgroundColor = "#38868a";
       if (mode === "longBreak") backgroundColor = "#7e53a2";
       document.body.style.backgroundColor = backgroundColor;

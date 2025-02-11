@@ -1,7 +1,7 @@
 export const initialTasksState = {
   tasks: [],
-  currentTask: null,
-  currentTaskDocumentID : null // for db
+  currentTask: "",
+  currentTaskDocumentID : "" // for db
 };
 
 export function tasksReducer(tasksState, action) {

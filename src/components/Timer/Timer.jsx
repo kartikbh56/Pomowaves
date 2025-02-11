@@ -12,7 +12,11 @@ import {
 import TimerNavigation from "./TimerNavigation";
 import Time from "./Time";
 import StartButton from "./StartButton";
-import { updateCurrentTask, updateTask } from "../../api/db";
+import {
+  updateCurrentTask,
+  updateTask,
+  updateTimerSettings,
+} from "../../api/db";
 
 export default function Timer() {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
@@ -20,7 +24,12 @@ export default function Timer() {
   const { tasksState, dispatchTasks } = useContext(TasksContext);
   const { dispatchReports } = useContext(ReportsContext);
 
-  const { status, mode, completedPomodoros, timers } = timerState;
+  const {
+    status,
+    mode,
+    completedPomodoros,
+    $id: timerSettingsDocumentId,
+  } = timerState;
 
   const { secondsRemaining } = countdownState;
 
@@ -52,7 +61,7 @@ export default function Timer() {
       console.log("clean up");
       clearInterval(timerIdRef.current);
     };
-  }, [status, timerState.timers[mode]]);
+  }, [status, timerState[mode]]);
   useEffect(() => {
     if (secondsRemaining <= 0) {
       clearInterval(timerIdRef.current);
@@ -60,10 +69,10 @@ export default function Timer() {
       if (mode === "pomodoro") {
         const completedPomodoros = timerState.completedPomodoros + 1;
         const nextMode =
-          completedPomodoros % timerState.timers.longBreakInterval === 0
+          completedPomodoros % timerState.longBreakInterval === 0
             ? "longBreak"
             : "shortBreak";
-        const secondsRemaining = timerState.timers[nextMode] * 60;
+        const secondsRemaining = timerState[nextMode] * 60;
 
         const newTasks = tasksState.tasks.map((task) =>
           task.id === tasksState.currentTask
@@ -99,19 +108,25 @@ export default function Timer() {
           mode: nextMode,
           status: "initial",
         });
+        //db
+        updateTimerSettings(timerSettingsDocumentId, {
+          completedPomodoros: completedPomodoros,
+          mode: nextMode,
+          status: "initial",
+        });
 
         dispatchTasks({
           type: "setTasks",
           tasks: newTasks,
         });
 
-        updateTask(tasksState.currentTask, {
-          completed: currentTask.completed + 1,
-        });
-
+        tasksState.currentTask &&
+          updateTask(tasksState.currentTask, {
+            completed: currentTask?.completed + 1,
+          });
       } else {
         const nextMode = "pomodoro";
-        const secondsRemaining = timerState.timers[nextMode] * 60;
+        const secondsRemaining = timerState[nextMode] * 60;
         const currentTask =
           tasksState.currentTask &&
           tasksState.tasks.find((t) => t.id === tasksState.currentTask);
@@ -127,21 +142,29 @@ export default function Timer() {
           type: "setCountdown",
           secondsRemaining: secondsRemaining,
         });
+        
         dispatchTimerState({
           type: "finishedBreak",
           mode: nextMode,
           status: "initial",
         });
+        //db
+        updateTimerSettings(timerSettingsDocumentId,{mode:nextMode,status:"initial"})
+
+
         dispatchTasks({
           type: "setTasks",
           currentTask: nextTask,
         });
-        updateCurrentTask(tasksState.currentTaskDocumentID, nextTask || currentTask.id)
+        updateCurrentTask(
+          tasksState.currentTaskDocumentID,
+          nextTask || currentTask.id || ""
+        );
       }
       let bellRings =
-        (completedPomodoros + 1) % timers.longBreakInterval === 0
-          ? timers.longBreakInterval
-          : (completedPomodoros + 1) % timers.longBreakInterval;
+        (completedPomodoros + 1) % timerState.longBreakInterval === 0
+          ? timerState.longBreakInterval
+          : (completedPomodoros + 1) % timerState.longBreakInterval;
       let id = setInterval(() => {
         new Audio("sounds/button.mp3").play();
       }, 200);
@@ -151,7 +174,7 @@ export default function Timer() {
     }
   }, [secondsRemaining, completedPomodoros]);
   const progressPercent =
-    100 - (secondsRemaining * 100) / (timerState.timers[mode] * 60);
+    100 - (secondsRemaining * 100) / (timerState[mode] * 60);
   const firstClick = useRef(false);
   return (
     <>

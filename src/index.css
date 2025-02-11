@@ -276,11 +276,11 @@ header {
 
 .settings-header {
   font-size: 20px;
-    padding: 15px;
-    font-weight: bold;
-    text-align: center;
-    border-bottom: 2px solid rgb(243 243 243);
-    letter-spacing: 1px;
+  padding: 15px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid rgb(243 243 243);
+  letter-spacing: 1px;
 }
 
 .settings-footer {
@@ -302,11 +302,11 @@ header {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 2px;
   color: white;
   font-size: 14px;
-  padding: 8px 12px;
+  padding: 10px;
   background-color: #3d3d3d;
   border: none;
   display: inline-block;
-  width: 30%;
+  width: 100%;
   font-family: 'Varela Round';
 }
 
@@ -1117,11 +1117,20 @@ header {
   display: block;
 }
 
-.user-info {
+.user-name {
   padding: 8px;
-  border-bottom: 1px solid #eee;
+  color: #4f4f4f;
+  text-align: center;
+  margin-bottom: 2px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.user-email{
+  text-align: center;
+  color: #545454;
+  font-size: 13px;
   margin-bottom: 8px;
-  color: #333;
 }
 
 #logout-button {
@@ -1129,10 +1138,16 @@ header {
   padding: 8px;
   background: none;
   border: none;
-  color: #da6852;
+  color: rgb(135, 24, 24);
   cursor: pointer;
   text-align: left;
+  margin-left: 0;
   font-size: 14px;
+  background-color: rgb(255, 240, 240);
+}
+
+#logout-button:hover{
+  background-color: rgb(255, 226, 226);
 }
 
 #logout-button img {
@@ -1152,14 +1167,30 @@ header {
 .spinner {
   width: 20px;
   height: 20px;
-  border: 10px solid #f3f3f3;
-  border-top: 10px solid #f3adac;
+  border: 10px solid   rgb(186, 73, 73);
+  border-top: 10px solid #f3f3f3;
   border-radius: 50%;
-  margin:10px;
-  animation: spin 0.5s ease-out infinite;
+  margin: 10px;
+  animation: spin .5s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.avatar {
+  border-radius: 15px;
+  width: 20px;
+  height: 20px;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.881);
+  text-align: center;
+  color: rgb(214, 112, 112);
+  padding: 1px;
 }

@@ -3,7 +3,6 @@ import { client } from "./appwrite";
 import { getCurrentUser } from "./auth";
 
 const databases = new Databases(client);
-
 let userId;
 async function initializeUser() {
   try {
@@ -21,13 +20,17 @@ const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const tasksCollectionId = import.meta.env.VITE_APPWRITE_TASKS_COLLECTION_ID;
 const currentTaskCollectionId = import.meta.env
   .VITE_APPWRITE_CURRENT_TASK_COLLECTION_ID;
+const timerSettingsCollectionId = import.meta.env.VITE_APPWRITE_TIMER_SETTINGS_COLLECTION_ID
 
+
+// Tasks
 export async function fetchTasks() {
   const result = await databases.listDocuments(
     databaseId, // databaseId
     tasksCollectionId // collectionIdj
   );
   console.log("Fetched tasks");
+  console.log(result.documents)
   return result.documents;
 }
 
@@ -74,6 +77,7 @@ export async function deleteTask(documentId) {
   console.log("Task deleted", result);
 }
 
+/*********************************************************************************/
 // currentTask
 
 export async function fetchCurrentTask() {
@@ -102,15 +106,6 @@ export async function addCurrentTask(currentTaskId) {
   return result;
 }
 
-// export async function deleteCurrentTask(currentTaskId) {
-//   const result = await databases.deleteDocument(
-//     databaseId,
-//     currentTaskCollectionId,
-//     currentTaskId
-//   );
-//   console.log(result);
-// }
-
 export async function updateCurrentTask(currentTaskDocumentID, newTaskId) {
   const result = await databases.updateDocument(
     databaseId,
@@ -120,3 +115,46 @@ export async function updateCurrentTask(currentTaskDocumentID, newTaskId) {
   );
   console.log("updated currentTask", result);
 }
+
+
+/*********************************************************************************/
+// Timer settings
+
+export async function fetchTimerSettings(){
+  const result = await databases.listDocuments(
+    databaseId, // databaseId
+    timerSettingsCollectionId // collectionId
+  );
+  // console.log("Fetched timer settings");
+  // console.log("timerSettings",result)
+  return result?.documents[0];
+}
+
+export async function createTimerSettings(timerSettings){
+  console.log("%c creating timer settings document","color:yellow;")
+  const result = await databases.createDocument(
+    databaseId, // databaseId
+    timerSettingsCollectionId, // collectionId
+    ID.unique(), // documentId
+    timerSettings, // data
+    [
+      Permission.read(Role.user(userId)), // Only this user can read
+      Permission.update(Role.user(userId)), // Only this user can update
+      Permission.delete(Role.user(userId)), // Only this user can delete
+    ]
+  );
+  console.log("Added Timer Settings", result);
+  return result;
+}
+
+export async function updateTimerSettings(timerSettingsDocumentId, modification){
+  const result = await databases.updateDocument(
+    databaseId,
+    timerSettingsCollectionId,
+    timerSettingsDocumentId,
+    modification
+  );
+  console.log("updated timer settings", result);
+}
+
+

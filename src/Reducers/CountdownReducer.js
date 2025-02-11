@@ -1,7 +1,7 @@
 import { initialTimerState } from "./TimerReducer";
 
 export const initialCountdownState = {
-  secondsRemaining: initialTimerState.timers[initialTimerState.mode] * 60,
+  secondsRemaining: initialTimerState[initialTimerState.mode] * 60,
 };
 
 export function countdownReducer(countdownState, action) {

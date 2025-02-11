@@ -7,7 +7,7 @@ export default function Summary() {
   const {tasksState} = useContext(TasksContext)
   const {tasks} = tasksState
   const {timerState} = useContext(TimerContext)
-  const {timers} = timerState
+  const {pomodoro,longBreak,shortBreak,longBreakInterval} = timerState
 
   const totalPomodoros = tasks.reduce(
     (acc, cur) => ({
@@ -19,13 +19,13 @@ export default function Summary() {
 
   const remainingTasks = totalPomodoros.estimated - totalPomodoros.completed;
   const longBreaksCount = Math.floor(
-    (remainingTasks - 1) / timers.longBreakInterval
+    (remainingTasks - 1) / longBreakInterval
   );
   const shortBreaksCount = Math.floor(remainingTasks - 1 - longBreaksCount);
   const timeRequired =
-    (remainingTasks * timers.pomodoro +
-      longBreaksCount * timers.longBreak +
-      shortBreaksCount * timers.shortBreak) *
+    (remainingTasks * pomodoro +
+      longBreaksCount * longBreak +
+      shortBreaksCount * shortBreak) *
     60; // seconds
   const hours = Math.floor(timeRequired / (60 * 60));
   const minutes = Math.floor(timeRequired / 60) - hours * 60;

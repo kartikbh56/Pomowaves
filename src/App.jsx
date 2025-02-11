@@ -35,6 +35,7 @@ import { isOpenReducer, initialIsOpenState } from "./Reducers/IsOpenReducer.js";
 import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
 
 import { getCurrentUser } from "./api/auth.js";
+import { createTimerSettings, fetchTimerSettings } from "./api/db.js";
 
 function App() {
   const [timerState, dispatchTimerState] = useReducer(
@@ -71,7 +72,43 @@ function App() {
     };
     checkAuth();
   }, []);
-  
+
+  useEffect(() => {
+    fetchTimerSettings().then((data) => {
+      if (!data?.$id) {
+        // if there's no document in the collection.
+        // create one for the user and update the states
+        createTimerSettings(timerState).then(data=>{
+          dispatchTimerState({
+            type: "initializeTimerSettings",
+            timerSettings: {
+              ...data,
+              startedAt: new Date(data.startedAt).getTime(),
+            },
+          });
+        })
+      } else {
+
+        // if already exists
+        dispatchTimerState({
+          type: "initializeTimerSettings",
+          timerSettings: {
+            ...data,
+            startedAt: new Date(data.startedAt).getTime(),
+          },
+        });
+        const secondsRemaining = data[data.mode] * 60;
+        
+        dispatchCountdown({
+          type: "setCountdown",
+          secondsRemaining: secondsRemaining,
+        });
+
+        // console.log("%c secondsRemaining","{background-color:'yellow'}",secondsRemaining)
+        // console.log("%c secondsRemaining","{background-color:'yellow'}",secondsRemaining)
+      }
+    });
+  }, []);
 
   if (loading) {
     return <Loader />;

@@ -27,10 +27,10 @@ function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
     isDropdownOpen && (
       <div className="user-dropdown" ref={dropdownRef}>
         <div className="dropdown-menu open">
-          <div className="user-info">{user?.name || "User"}</div>
-          <div className="user-info">{user?.email || "User"}</div>
+          <div className="user-name">{user?.name || "User"}</div>
+          <div className="user-email">{user?.email || "User"}</div>
           <button id="logout-button" onClick={onLogout}>
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent:"center" }}>
               <img src="icons/enter.png" alt="Logout Icon" />
               <span>Logout</span>
             </div>
@@ -53,7 +53,7 @@ export default function Navbar({ user }) {
   };
 
   const handleToggleDropdown = () => {
-    setIsDropdownOpen((prevState) => !prevState);
+    setIsDropdownOpen((prev) => !prev);
   };
 
   const handleLogout = async () => {
@@ -65,12 +65,13 @@ export default function Navbar({ user }) {
     }
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside or on the avatar button
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
+        !dropdownRef.current.contains(event.target) &&
+        event.target.closest(".btn") === null
       ) {
         setIsDropdownOpen(false);
       }
@@ -100,11 +101,7 @@ export default function Navbar({ user }) {
         />
 
         <button className="btn" onClick={handleToggleDropdown}>
-            <img
-              src="/icons/user.png"
-              alt="User Avatar"
-              style={{ borderRadius: "15px", width: "20px", height: "20px" }}
-            />
+          <div className="avatar">{user.name.charAt(0)}</div>
           <span>{user.name}</span>
         </button>
 
@@ -118,3 +115,5 @@ export default function Navbar({ user }) {
     </header>
   );
 }
+
+

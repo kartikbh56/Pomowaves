@@ -6,20 +6,22 @@ import {
   TimerContext,
   ReportsContext,
 } from "../../contexts/context";
-import { updateTask } from "../../api/db";
+import { updateTask, updateTimerSettings } from "../../api/db";
 
 export default function StartButton({ firstClick }) {
   const {
+    timerState,
     timerState: {
-      timers,
       status,
       mode,
       autoStartBreaks,
       autoStartPomodoros,
       startedAt,
+      // $id:timerSettingsDocumentId,
     },
     dispatchTimerState,
   } = useContext(TimerContext);
+  const timerSettingsDocumentId = timerState.$id;
   const { tasksState, dispatchTasks } = useContext(TasksContext);
 
   const { dispatchReports } = useContext(ReportsContext);
@@ -52,9 +54,19 @@ export default function StartButton({ firstClick }) {
     firstClick.current = true;
 
     if (status === "started") {
+      const secsCompletedAtPause = timerState[mode] * 60 - secondsRemaining;
       dispatchTimerState({
         type: "paused",
-        secsCompletedAtPause: timers[mode] * 60 - secondsRemaining,
+        status:"paused",
+        startedAt:null,
+        secsCompletedAtPause: secsCompletedAtPause,
+      });
+      //db
+      // console.log("timerSettingsDocumentId", timerSettingsDocumentId);
+      updateTimerSettings(timerSettingsDocumentId, {
+        status:"paused",
+        startedAt:null,
+        secsCompletedAtPause: secsCompletedAtPause,
       });
 
       const currentTaskName = tasksState.tasks.find(
@@ -74,7 +86,14 @@ export default function StartButton({ firstClick }) {
     } else {
       dispatchTimerState({
         type: "started",
+        status: "started",
         startedAt: Date.now(),
+      });
+      console.log("timerSettingsDocumentId", timerSettingsDocumentId);
+
+      updateTimerSettings(timerSettingsDocumentId, {
+        startedAt: new Date(),
+        status: "started",
       });
     }
 

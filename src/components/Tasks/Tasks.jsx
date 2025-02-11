@@ -17,8 +17,8 @@ export default function Tasks() {
     fetchCurrentTask().then((currentTask) => {
       dispatchTasks({
         type: "fetchCurrentTask",
-        currentTask: currentTask?.currentTaskId || null,
-        currentTaskDocumentID: currentTask?.$id || null,
+        currentTask: currentTask?.currentTaskId || "",
+        currentTaskDocumentID: currentTask?.$id || "",
       });
     });
   }, []);
