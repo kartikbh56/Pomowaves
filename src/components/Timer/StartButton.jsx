@@ -6,7 +6,13 @@ import {
   TimerContext,
   ReportsContext,
 } from "../../contexts/context";
-import { updateTask, updateTimerSettings } from "../../api/db";
+import {
+  addTimeLine,
+  updateReport,
+  updateTask,
+  updateTimerSettings,
+} from "../../api/db";
+import { getColor } from "../../utils/getColor";
 
 export default function StartButton({ firstClick }) {
   const {
@@ -17,14 +23,16 @@ export default function StartButton({ firstClick }) {
       autoStartBreaks,
       autoStartPomodoros,
       startedAt,
-      // $id:timerSettingsDocumentId,
     },
     dispatchTimerState,
   } = useContext(TimerContext);
   const timerSettingsDocumentId = timerState.$id;
   const { tasksState, dispatchTasks } = useContext(TasksContext);
 
-  const { dispatchReports } = useContext(ReportsContext);
+  const {
+    reportsState: { $id },
+    dispatchReports,
+  } = useContext(ReportsContext);
 
   const {
     countdownState: { secondsRemaining },
@@ -54,18 +62,18 @@ export default function StartButton({ firstClick }) {
     firstClick.current = true;
 
     if (status === "started") {
+      // when paused
       const secsCompletedAtPause = timerState[mode] * 60 - secondsRemaining;
       dispatchTimerState({
         type: "paused",
-        status:"paused",
-        startedAt:null,
+        status: "paused",
+        startedAt: null,
         secsCompletedAtPause: secsCompletedAtPause,
       });
       //db
-      // console.log("timerSettingsDocumentId", timerSettingsDocumentId);
       updateTimerSettings(timerSettingsDocumentId, {
-        status:"paused",
-        startedAt:null,
+        status: "paused",
+        startedAt: null,
         secsCompletedAtPause: secsCompletedAtPause,
       });
 
@@ -74,13 +82,26 @@ export default function StartButton({ firstClick }) {
       )?.task;
 
       if (Math.floor((Date.now() - startedAt) / (1000 * 60)) > 0) {
-        dispatchReports({
-          type: "addReport",
+        // If you pause the timer, add a report only if the focus time is more than 0 minutes
+        const report = {
           id: crypto.randomUUID(),
-          taskId: tasksState.currentTask,
-          task: currentTaskName,
+          task: currentTaskName || "No Task",
           startedAt: startedAt,
           endedAt: Date.now(),
+        };
+        const minutes = Math.round(
+          (report.endedAt - report.startedAt) / (1000 * 60)
+        );
+        dispatchReports({
+          type: "addReport",
+          ...report,
+          minutesFocused: minutes,
+        });
+        updateReport($id, { minutesFocused: minutes });
+        addTimeLine({
+          ...report,
+          startedAt: new Date(report.startedAt),
+          endedAt: new Date(report.endedAt),
         });
       }
     } else {
@@ -123,12 +144,7 @@ export default function StartButton({ firstClick }) {
       dispatchTasks({ type: "sortTasks" });
     }
   }
-  const btnColor =
-    mode === "pomodoro"
-      ? "rgb(186, 73, 73)"
-      : mode === "shortBreak"
-      ? "rgb(56, 134, 138)"
-      : "rgb(126, 83, 162)";
+  const btnColor = getColor(mode);
 
   return (
     <button

@@ -18,7 +18,7 @@ export default function Settings() {
   const { countdownState, dispatchCountdown } = useContext(CountdownContext);
   const timerSettingsDocumentId = timerState.$id;
 
-  const [userTimers, setUserTimers] = useState({
+  const [timerSettings, setTimerSettings] = useState({
     pomodoro: timerState.pomodoro,
     shortBreak: timerState.shortBreak,
     longBreak: timerState.longBreak,
@@ -27,53 +27,64 @@ export default function Settings() {
     autoStartBreaks: timerState.autoStartBreaks,
   });
 
-  // const [autoStartPomodoros, setAutoStartPomodoros] = useState(
-  //   timerState.autoStartPomodoros
-  // );
-  // const [autoStartBreaks, setAutoStartBreaks] = useState(
-  //   timerState.autoStartBreaks
-  // );
+  const currentTimerSettings = {
+    pomodoro: timerState.pomodoro,
+    shortBreak: timerState.shortBreak,
+    longBreak: timerState.longBreak,
+    longBreakInterval: timerState.longBreakInterval,
+    autoStartPomodoros: timerState.autoStartPomodoros,
+    autoStartBreaks: timerState.autoStartBreaks,
+  };
+
+  const settingsChanged =
+    Object.values(timerSettings).join("") !==
+    Object.values(currentTimerSettings).join("");
 
   function saveSettings() {
-    let secondsRemaining =
-      timerState.status === "paused"
-        ? userTimers[timerState.mode] * 60 -
-          (timerState[timerState.mode] * 60 - countdownState.secondsRemaining)
-        : userTimers[timerState.mode] * 60;
+    if (settingsChanged) {
+      let secondsRemaining =
+        timerState.status === "paused"
+          ? timerSettings[timerState.mode] * 60 -
+            (timerState[timerState.mode] * 60 - countdownState.secondsRemaining)
+          : timerSettings[timerState.mode] * 60;
 
-    if (timerState.secsCompletedAtPause && timerState.status === "started") {
-      secondsRemaining -= timerState.secsCompletedAtPause;
-      dispatchTimerState({ type: "clearPause", secsCompletedAtPause: 0 });
-      updateTimerSettings(timerSettingsDocumentId, { secsCompletedAtPause: 0 });
+      if (timerState.secsCompletedAtPause && timerState.status === "started") {
+        secondsRemaining -= timerState.secsCompletedAtPause;
+        dispatchTimerState({ type: "clearPause", secsCompletedAtPause: 0 });
+        updateTimerSettings(timerSettingsDocumentId, {
+          secsCompletedAtPause: 0,
+        });
+      }
+
+      dispatchTimerState({
+        type: "changeTimerSettings",
+        timerSettings: timerSettings,
+      });
+
+      updateTimerSettings(timerSettingsDocumentId, { ...timerSettings });
+
+      dispatchCountdown({
+        type: "setCountdown",
+        secondsRemaining: secondsRemaining,
+      });
     }
-    // console.log(secondsRemaining, "updated")
-
     dispatchIsOpen({ type: "toggleMenu", menu: "settings" });
-
-    dispatchTimerState({
-      type: "changeTimerSettings",
-      timerSettings: userTimers,
-
-      // autoStartBreaks: autoStartBreaks,
-      // autoStartPomodoros: autoStartPomodoros,
-    });
-
-    updateTimerSettings(timerSettingsDocumentId, { ...userTimers });
-
-    dispatchCountdown({
-      type: "setCountdown",
-      secondsRemaining: secondsRemaining,
-    });
   }
   return (
     <SettingsContainer saveSettings={saveSettings}>
-      <TimeSettings userTimers={userTimers} setUserTimers={setUserTimers} />
-      <AutoStartOptions userTimers={userTimers} setUserTimers={setUserTimers} />
-      <LongBreakInterval
-        userTimers={userTimers}
-        setUserTimers={setUserTimers}
+      <TimeSettings
+        timerSettings={timerSettings}
+        setTimerSettings={setTimerSettings}
       />
-      <Footer saveSettings={saveSettings} />
+      <AutoStartOptions
+        timerSettings={timerSettings}
+        setTimerSettings={setTimerSettings}
+      />
+      <LongBreakInterval
+        timerSettings={timerSettings}
+        setTimerSettings={setTimerSettings}
+      />
+      <Footer saveSettings={saveSettings} settingsChanged={settingsChanged} />
     </SettingsContainer>
   );
 }

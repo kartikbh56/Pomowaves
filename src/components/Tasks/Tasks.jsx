@@ -14,6 +14,8 @@ export default function Tasks() {
       dispatchTasks({ type: "fetchTasks", tasks: data })
     );
 
+    dispatchTasks({ type: "sortTasks" });
+
     fetchCurrentTask().then((currentTask) => {
       dispatchTasks({
         type: "fetchCurrentTask",

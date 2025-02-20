@@ -1,4 +1,4 @@
-import { Databases, Permission, Role, ID } from "appwrite";
+import { Databases, Permission, Role, ID, Query } from "appwrite";
 import { client } from "./appwrite";
 import { getCurrentUser } from "./auth";
 
@@ -20,8 +20,11 @@ const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const tasksCollectionId = import.meta.env.VITE_APPWRITE_TASKS_COLLECTION_ID;
 const currentTaskCollectionId = import.meta.env
   .VITE_APPWRITE_CURRENT_TASK_COLLECTION_ID;
-const timerSettingsCollectionId = import.meta.env.VITE_APPWRITE_TIMER_SETTINGS_COLLECTION_ID
-
+const timerSettingsCollectionId = import.meta.env
+  .VITE_APPWRITE_TIMER_SETTINGS_COLLECTION_ID;
+const timeLineCollectionId = import.meta.env
+  .VITE_APPWRITE_TIMELINE_COLLECTION_ID;
+const reportsCollectionId = import.meta.env.VITE_APPWRITE_REPORTS_COLLECTION_ID;
 
 // Tasks
 export async function fetchTasks() {
@@ -30,14 +33,14 @@ export async function fetchTasks() {
     tasksCollectionId // collectionIdj
   );
   console.log("Fetched tasks");
-  console.log(result.documents)
+  console.log(result.documents);
   return result.documents;
 }
 
 export function addTask(task, taskId) {
   let promise = databases.createDocument(
     databaseId,
-    tasksCollectionId,
+    tasksCollectionId,  
     taskId,
     task,
     [
@@ -116,22 +119,20 @@ export async function updateCurrentTask(currentTaskDocumentID, newTaskId) {
   console.log("updated currentTask", result);
 }
 
-
 /*********************************************************************************/
 // Timer settings
 
-export async function fetchTimerSettings(){
+export async function fetchTimerSettings() {
   const result = await databases.listDocuments(
     databaseId, // databaseId
     timerSettingsCollectionId // collectionId
   );
-  // console.log("Fetched timer settings");
-  // console.log("timerSettings",result)
+  console.log("Fetched timer settings");
+  console.log("timerSettings", result);
   return result?.documents[0];
 }
 
-export async function createTimerSettings(timerSettings){
-  console.log("%c creating timer settings document","color:yellow;")
+export async function createTimerSettings(timerSettings) {
   const result = await databases.createDocument(
     databaseId, // databaseId
     timerSettingsCollectionId, // collectionId
@@ -147,7 +148,10 @@ export async function createTimerSettings(timerSettings){
   return result;
 }
 
-export async function updateTimerSettings(timerSettingsDocumentId, modification){
+export async function updateTimerSettings(
+  timerSettingsDocumentId,
+  modification
+) {
   const result = await databases.updateDocument(
     databaseId,
     timerSettingsCollectionId,
@@ -157,4 +161,104 @@ export async function updateTimerSettings(timerSettingsDocumentId, modification)
   console.log("updated timer settings", result);
 }
 
+/*********************************************************************************/
+// Timeline
+export async function initialFetchTimeline(limit) {
+  const docs = await databases.listDocuments(databaseId, timeLineCollectionId, [
+    Query.limit(limit),
+    Query.orderDesc("startedAt"),
+  ]);
+  console.log("timeline", docs);
+  return docs;
+}
 
+export async function fetchTimeline(limit, lastId) {
+  const docs = await databases.listDocuments(databaseId, timeLineCollectionId, [
+    Query.limit(limit),
+    Query.cursorAfter(lastId),
+    Query.orderDesc("startedAt"),
+  ]);
+  console.log("timeline", docs);
+  return docs;
+}
+
+export async function fetchTimelineOnDate(startOfTheDay, endOfTheDay) {
+  const docs = await databases.listDocuments(databaseId, timeLineCollectionId, [
+    Query.and([
+      Query.lessThan("$createdAt", endOfTheDay),
+      Query.greaterThan("$createdAt", startOfTheDay),
+    ]),
+  ]);
+  console.log("timeline", docs);
+  return docs;
+}
+
+export async function addTimeLine(report) {
+  let promise = databases.createDocument(
+    databaseId,
+    timeLineCollectionId,
+    report.id,
+    {
+      task: report.task,
+      startedAt: report.startedAt,
+      endedAt: report.endedAt,
+    },
+    [
+      Permission.read(Role.user(userId)), // Only this user can read
+      Permission.update(Role.user(userId)), // Only this user can update
+      Permission.delete(Role.user(userId)), // Only this user can delete
+    ]
+  );
+
+  promise.then(
+    function (response) {
+      console.log("Timeline added: ", response);
+    },
+    function (error) {
+      console.log(error);
+    }
+  );
+}
+
+export async function deleteTimeline(documentId) {
+  const result = await databases.deleteDocument(
+    databaseId, // databaseId
+    timeLineCollectionId, // collectionId
+    documentId // documentId
+  );
+  console.log("Task deleted", result);
+}
+
+/******************************************************************/
+// REPORTS
+export async function fetchReports() {
+  const result = await databases.listDocuments(databaseId, reportsCollectionId);
+  console.log("Fetched reports", result);
+  return result?.documents[0];
+}
+
+export async function createReport(reports) {
+  const result = await databases.createDocument(
+    databaseId, // databaseId
+    reportsCollectionId, // collectionId
+    ID.unique(), // documentId
+    reports, // data
+    [
+      Permission.read(Role.user(userId)), // Only this user can read
+      Permission.update(Role.user(userId)), // Only this user can update
+      Permission.delete(Role.user(userId)), // Only this user can delete
+    ]
+  );
+  console.log("Added initial reports", result);
+  return result;
+}
+
+export async function updateReport(reportsDocumentId, modification) {
+  const result = await databases.updateDocument(
+    databaseId,
+    reportsCollectionId,
+    reportsDocumentId,
+    modification
+  );
+  console.log("updated reports settings", result);
+}

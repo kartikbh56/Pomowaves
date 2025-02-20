@@ -1,74 +1,96 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import { useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { ReportsContext } from "../../../contexts/context";
+import { deleteTimeline, fetchTimeline } from "../../../api/db";
 
-const TimeTracker = () => {
+const LIMIT = 20; // Number of entries per fetch
+
+export default function TimeTracker(){
   const {
-    reportsState: { timeLine },
+    reportsState: { timeLine, totalDocs }, // totalDocs stored in reducer
     dispatchReports,
   } = useContext(ReportsContext);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const lastDoc = timeLine[timeLine.length - 1];
+  const [loading, setLoading] = useState(false);
+  const [lastId, setLastId] = useState(lastDoc?.$id || lastDoc?.id); // Store last document ID for pagination
+  const tableBodyRef = useRef(null);
 
-  const totalPages = Math.ceil(timeLine.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentEntries = timeLine.slice(startIndex, endIndex);
+  const fetchMoreData = () => {
+    if (loading || timeLine.length >= totalDocs) return; // Stop fetching if all data is loaded
+    setLoading(true);
 
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    fetchTimeline(LIMIT, lastId).then((response) => {
+      if (response.documents.length > 0) {
+        dispatchReports({
+          type: "fetchMoreEntries",
+          timeLine: response.documents.map((r) => ({
+            ...r,
+            startedAt: new Date(r.startedAt),
+            endedAt: new Date(r.endedAt),
+          })),
+          totalDocs: response.total,
+        });
+        setLastId(response.documents[response.documents.length - 1].$id);
+      }
+      setLoading(false);
+    });
+
   };
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  const handleScroll = () => {
+    if (!tableBodyRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = tableBodyRef.current;
+
+    // Check if scrolled to the bottom
+    if (scrollTop + clientHeight >= scrollHeight - 5 && !loading) {
+      fetchMoreData();
+    }
   };
 
   const handleDelete = (id) => {
-    const updatedEntries = timeLine.filter((item) => item.id !== id);
+    const updatedEntries = timeLine.filter(
+      (item) => (item.$id || item.id) !== id
+    );
     dispatchReports({ type: "deleteEntry", timeLine: updatedEntries });
+    deleteTimeline(id);
   };
 
   return (
-    <div className="time-tracker">
-      {timeLine.length > 0 ? (
-        <>
-          <div className="header">
-            <div>DATE</div>
-            <div>TASK</div>
-            <div>MINUTES</div>
-            <div></div>
+    <div className="time-tracker-container">
+      {/* Fixed Header */}
+      <div className="header">
+        <div>DATE</div>
+        <div>TASK</div>
+        <div>MINUTES</div>
+        <div></div>
+      </div>
+
+      {/* Scrollable Table Body */}
+      <div ref={tableBodyRef} className="table-body" onScroll={handleScroll}>
+        {timeLine.length > 0 ? (
+          <>
+            {timeLine.map((entry) => (
+              <TimeEntry
+                key={entry.$id || entry.id}
+                entry={entry}
+                onDelete={() => handleDelete(entry.$id || entry.id)}
+              />
+            ))}
+            {loading && <p style={{textAlign:"center"}}>Loading...</p>}
+          </>
+        ) : (
+          <div
+            className="placeholder"
+            style={{ textAlign: "center", fontSize: "13px", padding: "10px" }}
+          >
+            No records
           </div>
-          {currentEntries.map((entry) => (
-            <TimeEntry
-              key={entry.id}
-              entry={entry}
-              onDelete={() => handleDelete(entry.id)}
-            />
-          ))}
-          {totalPages > 1 && (
-            <div className="pagination">
-              {currentPage > 1 && (
-                <button className="prev up-down-btn" onClick={handlePrevious}>
-                  <img className="img" src="icons/left-arrow.png" alt="next" />
-                </button>
-              )}
-              <span className="page-number">{currentPage}</span>
-              {currentPage !== totalPages && (
-                <button className="next up-down-btn" onClick={handleNext}>
-                  <img className="img" src="icons/right-arrow.png" alt="next" />
-                </button>
-              )}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="placeholder">No records</div>
-      )}
+        )}
+      </div>
     </div>
   );
-};
+}
 
 function TimeEntry({ entry, onDelete }) {
   const { task, startedAt, endedAt } = entry;
@@ -104,8 +126,6 @@ function TimeEntry({ entry, onDelete }) {
     </div>
   );
 }
-
-export default TimeTracker;
 
 const Trash2 = () => (
   <svg

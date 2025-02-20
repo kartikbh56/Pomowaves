@@ -13,16 +13,21 @@ import TimerNavigation from "./TimerNavigation";
 import Time from "./Time";
 import StartButton from "./StartButton";
 import {
+  addTimeLine,
   updateCurrentTask,
   updateTask,
   updateTimerSettings,
+  updateReport
 } from "../../api/db";
 
 export default function Timer() {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
   const { countdownState, dispatchCountdown } = useContext(CountdownContext);
   const { tasksState, dispatchTasks } = useContext(TasksContext);
-  const { dispatchReports } = useContext(ReportsContext);
+  const {
+    reportsState: { $id },
+    dispatchReports,
+  } = useContext(ReportsContext);
 
   const {
     status,
@@ -56,7 +61,6 @@ export default function Timer() {
       clearInterval(timerIdRef.current);
       timerIdRef.current = null;
     }
-
     return () => {
       console.log("clean up");
       clearInterval(timerIdRef.current);
@@ -66,6 +70,9 @@ export default function Timer() {
     if (secondsRemaining <= 0) {
       clearInterval(timerIdRef.current);
       timerIdRef.current = null;
+
+      dispatchTimerState({ type: "clearPause", secsCompletedAtPause: 0 });
+
       if (mode === "pomodoro") {
         const completedPomodoros = timerState.completedPomodoros + 1;
         const nextMode =
@@ -86,16 +93,34 @@ export default function Timer() {
 
         const currentTaskName = currentTask?.task;
 
-        if (Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0) {
-          dispatchReports({
-            type: "pomodoroFinished",
-            id: crypto.randomUUID(),
-            taskId: tasksState.tasks.currentTask,
-            task: currentTaskName,
-            startedAt: timerState.startedAt,
-            endedAt: Date.now(),
-          });
-        }
+        const report = {
+          id: crypto.randomUUID(),
+          task: currentTaskName || "No task",
+          startedAt: timerState.startedAt,
+          endedAt: timerState.startedAt + timerState.pomodoro * 60 * 1000,
+        };
+        const minutes = Math.round(
+          (report.endedAt - report.startedAt) / (1000 * 60)
+        );
+        // reports
+        dispatchReports({
+          type: "addReport",
+          ...report,
+          // the endedAt should be calculated according to the timerState. because in some cases, you start the timer and close the app, and then re-open it after the pomodoro is finished
+          // (for example: pomodoro time is 25 mins, you start the timer and close it, and then you re-open it at 30 mins).
+          // in that case, the timer automatically switches to break, because of efficient time elapsed calculation using startedAt state and currentTime (Date.now())
+          // (startedAt + timerState[mode]*60*1000 - Date.now() < 0) which triggers "finishPomodoro" / "finishBreak"
+          // that works fine, but updating endedAt:Date.now() adds into reports that the pomodoro is finished beyond the timerState timers. so,
+          // timerState.startedAt + timerState.pomodoro * 60 * 1000 works perfectly.
+          minutesFocused:minutes
+        });
+        updateReport($id, { minutesFocused: minutes });
+
+        addTimeLine({
+          ...report,
+          startedAt: new Date(report.startedAt),
+          endedAt: new Date(report.endedAt),
+        });
 
         dispatchCountdown({
           type: "setCountdown",
@@ -107,12 +132,14 @@ export default function Timer() {
           completedPomodoros: completedPomodoros,
           mode: nextMode,
           status: "initial",
+          startedAt: null,
         });
         //db
         updateTimerSettings(timerSettingsDocumentId, {
           completedPomodoros: completedPomodoros,
           mode: nextMode,
           status: "initial",
+          secsCompletedAtPause: 0,
         });
 
         dispatchTasks({
@@ -142,15 +169,19 @@ export default function Timer() {
           type: "setCountdown",
           secondsRemaining: secondsRemaining,
         });
-        
+
         dispatchTimerState({
           type: "finishedBreak",
           mode: nextMode,
           status: "initial",
+          startedAt: null,
         });
         //db
-        updateTimerSettings(timerSettingsDocumentId,{mode:nextMode,status:"initial"})
-
+        updateTimerSettings(timerSettingsDocumentId, {
+          mode: nextMode,
+          status: "initial",
+          secsCompletedAtPause: 0,
+        });
 
         dispatchTasks({
           type: "setTasks",
@@ -161,16 +192,7 @@ export default function Timer() {
           nextTask || currentTask.id || ""
         );
       }
-      let bellRings =
-        (completedPomodoros + 1) % timerState.longBreakInterval === 0
-          ? timerState.longBreakInterval
-          : (completedPomodoros + 1) % timerState.longBreakInterval;
-      let id = setInterval(() => {
-        new Audio("sounds/button.mp3").play();
-      }, 200);
-      setTimeout(() => {
-        clearInterval(id);
-      }, 200 * bellRings);
+      new Audio("sounds/button.mp3").play();
     }
   }, [secondsRemaining, completedPomodoros]);
   const progressPercent =

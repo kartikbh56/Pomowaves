@@ -4,21 +4,19 @@ import formatDate from "../../../../utils/formatDate";
 
 export default function DaySelector({ selectedDate, setSelectedDate }) {
 
-  const handlePrevDay = () => {
-    setSelectedDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(prevDate.getDate() - 1);
-      return newDate;
-    });
-  };
-
-  const handleNextDay = () => {
-    setSelectedDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(prevDate.getDate() + 1);
-      return newDate;
-    });
-  };
+  function handlePrevDay() {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() - 1);
+    setSelectedDate(newDate);
+  }
+  
+  function handleNextDay() {
+    if (selectedDate.getDate() !== new Date().getDate()) { // you can only select today's date and the previous ones not tomorrow's
+      const newDate = new Date(selectedDate);
+      newDate.setDate(selectedDate.getDate() + 1);
+      setSelectedDate(newDate);
+    }
+  }
 
   return (
     <TimelineController

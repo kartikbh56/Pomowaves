@@ -1,28 +1,22 @@
 /* eslint-disable react/prop-types */
-export default function LongBreakInterval({ userTimers, setUserTimers }) {
+export default function LongBreakInterval({ timerSettings, setTimerSettings }) {
     return (
       <div className="autoStartOption">
         <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "50%",
-          }}
         >
           Long Break Interval
         </div>
         <div
           className="settings-input"
-          style={{ width: "30%", marginBottom: "0px" }}
+          style={{  margin: "0",width:"20%", padding:"0px" }}
         >
           <input
             type="number"
             min={2}
-            value={userTimers.longBreakInterval}
+            value={timerSettings.longBreakInterval}
             onChange={(e) =>
-              setUserTimers({
-                ...userTimers,
+              setTimerSettings({
+                ...timerSettings,
                 longBreakInterval: Number(e.target.value),
               })
             }

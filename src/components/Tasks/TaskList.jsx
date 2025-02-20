@@ -10,10 +10,18 @@ export default function TaskList() {
 
   const [options, setOptions] = useState(false);
 
-  const overallTasksProgress = tasks.reduce(function (acc, cur) {
-    const progress = (cur.completed * 100) / cur.estimated;
-    return acc + progress / tasks.length;
-  }, 0);
+
+  const totalPomodoros = tasks.reduce(
+    (acc, cur) => ({
+      estimated: acc.estimated + cur.estimated,
+      completed: acc.completed + cur.completed,
+    }),
+    { estimated: 0, completed: 0 }
+  );
+
+
+  const overallTasksProgress = totalPomodoros.estimated ? (totalPomodoros.completed * 100) / totalPomodoros.estimated : 0;
+
 
   const toggleOptions = () => setOptions(!options);
 

@@ -1,4 +1,4 @@
-export default function Ranking(){
+export default function LeaderBoard(){
     return(
         <div>Reports</div>
     )

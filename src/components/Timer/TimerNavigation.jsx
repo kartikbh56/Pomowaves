@@ -1,59 +1,95 @@
 /* eslint-disable react/prop-types */
-import { updateTimerSettings } from "../../api/db";
-import { TimerContext,CountdownContext } from "../../contexts/context";
+import { addTimeLine, updateTimerSettings, updateReport } from "../../api/db";
+import {
+  TimerContext,
+  CountdownContext,
+  ReportsContext,
+  TasksContext,
+} from "../../contexts/context";
+import { getColor } from "../../utils/getColor";
 import { useEffect, useContext } from "react";
-export default function TimerNavigation({
-    firstClick,
-  }) {
-    const {timerState,dispatchTimerState} = useContext(TimerContext)
-    const {$id:timerSettingsDocumentId} = timerState
-    const {mode} = timerState
-    const {dispatchCountdown} = useContext(CountdownContext)
-    const selected = {
-      fontWeight: "bold",
-      backgroundColor: "rgba(0, 0, 0, 0.15)",
-    };
-    const buttons = ["pomodoro", "shortBreak", "longBreak"].map((btn) => (
-      <button
-        style={mode === btn ? selected : {}}
-        key={btn}
-        onClick={() => {
-          dispatchTimerState({
-            type: "changeMode",
-            mode: btn,
-            status: "initial",
+export default function TimerNavigation({ firstClick }) {
+  const { timerState, dispatchTimerState } = useContext(TimerContext);
+  const { tasksState } = useContext(TasksContext);
+  const {
+    reportsState: { $id },
+    dispatchReports,
+  } = useContext(ReportsContext);
+  const { $id: timerSettingsDocumentId } = timerState;
+  const { mode } = timerState;
+  const { dispatchCountdown } = useContext(CountdownContext);
+  const selected = {
+    fontWeight: "bold",
+    backgroundColor: "rgba(0, 0, 0, 0.15)",
+  };
+  const buttons = ["pomodoro", "shortBreak", "longBreak"].map((btn) => (
+    <button
+      style={mode === btn ? selected : {}}
+      key={btn}
+      onClick={() => {
+        dispatchTimerState({
+          type: "changeMode",
+          mode: btn,
+          status: "initial",
+          secsCompletedAtPause: 0,
+          startedAt: null,
+        });
+        //db
+        updateTimerSettings(timerSettingsDocumentId, {
+          mode: btn,
+          status: "initial",
+          secsCompletedAtPause: 0,
+          startedAt: null,
+        });
+
+        dispatchCountdown({
+          type: "setCountdown",
+          secondsRemaining: timerState[btn] * 60,
+        });
+
+        const currentTask = tasksState.tasks?.find(
+          (t) => t.id === tasksState.currentTask
+        );
+        const currentTaskName = currentTask?.task;
+
+        if (
+          timerState.mode === "pomodoro" &&
+          timerState.status != "initial" &&
+          Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0
+        ) {
+          // If you reset the timer (), add a report only if the focus time is more than 0
+          const report = {
+            id: crypto.randomUUID(),
+            task: currentTaskName || "No task",
+            startedAt: timerState.startedAt,
+            endedAt: Date.now(),
+          };
+          const minutes = Math.round(
+            (report.endedAt - report.startedAt) / (1000 * 60)
+          );
+          dispatchReports({
+            type: "addReport",
+            ...report,
+            minuteFocused: minutes,
           });
-          //db
-          updateTimerSettings(timerSettingsDocumentId,{mode:btn,status:"initial"})
+          updateReport($id, { minutesFocused: minutes });
 
-          dispatchCountdown({
-            type: "setCountdown",
-            secondsRemaining: timerState[btn] * 60,
+          addTimeLine({
+            ...report,
+            startedAt: new Date(report.startedAt),
+            endedAt: new Date(report.endedAt),
           });
-
-        //   dispatchReports({
-        //   type: "addReport",
-        //   id: crypto.randomUUID(),
-        //   taskId: tasksState.currentTask,
-        //   task: currentTaskName,
-        //   startedAt: startedAt,
-        //   endedAt: Date.now(),
-        // });
-
-          firstClick.current = false;
-        }}
-      >
-        {btn === "pomodoro" && "Pomodoro"}
-        {btn === "shortBreak" && "Short Break"}
-        {btn === "longBreak" && "Long Break"}
-      </button>
-    ));
-    useEffect(() => {
-      let backgroundColor;
-      if (mode === "pomodoro") backgroundColor = "rgb(186, 74, 73)";
-      if (mode === "shortBreak") backgroundColor = "#38868a";
-      if (mode === "longBreak") backgroundColor = "#7e53a2";
-      document.body.style.backgroundColor = backgroundColor;
-    }, [mode]);
-    return <div className="timernav">{buttons}</div>;
-  }
+        }
+        firstClick.current = false;
+      }}
+    >
+      {btn === "pomodoro" && "Pomodoro"}
+      {btn === "shortBreak" && "Short Break"}
+      {btn === "longBreak" && "Long Break"}
+    </button>
+  ));
+  useEffect(() => {
+    document.body.style.backgroundColor = getColor(mode);
+  }, [mode]);
+  return <div className="timernav">{buttons}</div>;
+}

@@ -35,7 +35,14 @@ import { isOpenReducer, initialIsOpenState } from "./Reducers/IsOpenReducer.js";
 import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
 
 import { getCurrentUser } from "./api/auth.js";
-import { createTimerSettings, fetchTimerSettings } from "./api/db.js";
+import {
+  createReport,
+  createTimerSettings,
+  fetchReports,
+  fetchTimerSettings,
+  initialFetchTimeline,
+  updateReport,
+} from "./api/db.js";
 
 function App() {
   const [timerState, dispatchTimerState] = useReducer(
@@ -54,7 +61,6 @@ function App() {
     isOpenReducer,
     initialIsOpenState
   );
-
   const [reportsState, dispatchReports] = useReducer(
     reportsReducer,
     initialReports
@@ -78,34 +84,107 @@ function App() {
       if (!data?.$id) {
         // if there's no document in the collection.
         // create one for the user and update the states
-        createTimerSettings(timerState).then(data=>{
+        createTimerSettings(timerState).then((data) => {
           dispatchTimerState({
             type: "initializeTimerSettings",
             timerSettings: {
               ...data,
-              startedAt: new Date(data.startedAt).getTime(),
+              startedAt: data.startedAt, // it's null because, it's being created for the first time.
             },
           });
-        })
+        });
       } else {
-
         // if already exists
         dispatchTimerState({
           type: "initializeTimerSettings",
           timerSettings: {
             ...data,
-            startedAt: new Date(data.startedAt).getTime(),
+            startedAt: new Date(data.startedAt).getTime() || null,
+            // new Date(null).getTime() is 0, so, if `startedAt` fetched form db is null, then store it as it is in the state, converting it to Date() causes inaccurate time calculations.
           },
         });
-        const secondsRemaining = data[data.mode] * 60;
-        
+        const secondsRemaining =
+          data[data.mode] * 60 - data.secsCompletedAtPause;
+
         dispatchCountdown({
           type: "setCountdown",
           secondsRemaining: secondsRemaining,
         });
+      }
+    });
 
-        // console.log("%c secondsRemaining","{background-color:'yellow'}",secondsRemaining)
-        // console.log("%c secondsRemaining","{background-color:'yellow'}",secondsRemaining)
+    initialFetchTimeline(8).then((data) => {
+      dispatchReports({
+        type: "fetchReports",
+        reports: data.documents.map((r) => ({
+          ...r,
+          startedAt: new Date(r.startedAt),
+          endedAt: new Date(r.endedAt),
+        })),
+        totalDocs: data.total,
+      });
+    });
+
+    fetchReports().then((data) => {
+      console.log("this is what got for you", data);
+      if (!data?.$id) {
+        // if there's no document in the collection.
+        // create one for the user and update the states
+        const reports = {
+          minutesFocused: reportsState.minutesFocused,
+          daysAccessed: reportsState.daysAccessed,
+          dayStreak: reportsState.dayStreak,
+        };
+        createReport(reports).then((data) => {
+          console.log(
+            "%c created reports ",
+            "background: red; color: white; font-weight: bold; padding: 5px;"
+          );
+          dispatchReports({
+            type: "initialFetchSummary",
+            report: { ...data },
+          });
+        });
+      } else {
+        // if already exists
+        console.log("reports data 📃", data);
+        dispatchReports({
+          type: "initialFetchSummary",
+          report: data,
+        });
+
+        const today = new Date();
+        const lastAccessed = new Date(data.lastAccessed || new Date());
+
+        let streak = data.dayStreak;
+        let daysAccessed = data.daysAccessed;
+
+        // this is calculated next day of lastAccessed day, if this day is equal to the current day, then increment the streak.
+        const nextDay = new Date(lastAccessed);
+        nextDay.setDate(lastAccessed.getDate() + 1);
+
+        if (nextDay.toDateString() === today.toDateString()) {
+          streak = streak + 1;
+        } else if (today > lastAccessed) {
+          streak = 1;
+        }
+
+        daysAccessed =
+          lastAccessed.getDate() !== today.getDate()
+            ? daysAccessed + 1
+            : daysAccessed;
+
+        updateReport(data.$id, {
+          dayStreak: streak,
+          daysAccessed: daysAccessed,
+          lastAccessed: new Date(),
+        }).then((data) => {
+          console.log("updated reports", data);
+        });
+        dispatchReports({
+          type: "updateReports",
+          report: { streak: streak, daysAccessed: daysAccessed },
+        });
       }
     });
   }, []);

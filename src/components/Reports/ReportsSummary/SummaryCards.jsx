@@ -5,11 +5,11 @@ import { ReportsContext } from "../../../contexts/context";
 
 export default function SummaryCards() {
   const {
-    reportsState: { hoursFocused, daysAccessed, dayStreak },
+    reportsState: { minutesFocused, daysAccessed, dayStreak },
   } = useContext(ReportsContext);
 
   const cardsData = [
-    { icon: "icons/three-o-clock-clock.png", value: hoursFocused, label: "Hours focused" },
+    { icon: "icons/three-o-clock-clock.png", value: Math.round(minutesFocused/60), label: "Hours focused" },
     { icon: "icons/calandar.png", value: daysAccessed, label: "Days accessed" },
     { icon: "icons/fire.png", value: dayStreak, label: "Days streak" },
   ];

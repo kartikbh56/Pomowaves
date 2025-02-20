@@ -1,17 +1,17 @@
 /* eslint-disable react/prop-types */
-export default function TimeSettings({ userTimers, setUserTimers }) {
+export default function TimeSettings({ timerSettings, setTimerSettings }) {
     const timers = [
-      { name: "Pomodoro", mode: "pomodoro", value: userTimers.pomodoro, min: 1 },
+      { name: "Pomodoro", mode: "pomodoro", value: timerSettings.pomodoro, min: 1 },
       {
         name: "Short Break",
         mode: "shortBreak",
-        value: userTimers.shortBreak,
+        value: timerSettings.shortBreak,
         min: 0,
       },
       {
         name: "Long Break",
         mode: "longBreak",
-        value: userTimers.longBreak,
+        value: timerSettings.longBreak,
         min: 0,
       },
     ];
@@ -26,8 +26,8 @@ export default function TimeSettings({ userTimers, setUserTimers }) {
               min={t.min}
               value={t.value}
               onChange={(e) =>
-                setUserTimers({
-                  ...userTimers,
+                setTimerSettings({
+                  ...timerSettings,
                   [t.mode]: Number(e.target.value),
                 })
               }

@@ -1,13 +1,12 @@
 import { useContext } from "react";
-import { TasksContext,TimerContext } from "../contexts/context";
+import { TasksContext, TimerContext } from "../contexts/context";
 
 /* eslint-disable react/prop-types */
 export default function Summary() {
-
-  const {tasksState} = useContext(TasksContext)
-  const {tasks} = tasksState
-  const {timerState} = useContext(TimerContext)
-  const {pomodoro,longBreak,shortBreak,longBreakInterval} = timerState
+  const { tasksState } = useContext(TasksContext);
+  const { tasks } = tasksState;
+  const { timerState } = useContext(TimerContext);
+  const { pomodoro, longBreak, shortBreak, longBreakInterval } = timerState;
 
   const totalPomodoros = tasks.reduce(
     (acc, cur) => ({
@@ -18,9 +17,10 @@ export default function Summary() {
   );
 
   const remainingTasks = totalPomodoros.estimated - totalPomodoros.completed;
-  const longBreaksCount = Math.floor(
-    (remainingTasks - 1) / longBreakInterval
-  );
+  if (remainingTasks === 0) return <></>;
+  
+  const longBreaksCount = Math.floor((remainingTasks - 1) / longBreakInterval);
+
   const shortBreaksCount = Math.floor(remainingTasks - 1 - longBreaksCount);
   const timeRequired =
     (remainingTasks * pomodoro +
@@ -32,7 +32,7 @@ export default function Summary() {
 
   const finishAt = new Date(Date.now() + timeRequired * 1000);
   const finishAtHrs24h = finishAt.getHours();
-  const finishAtHrs12h = finishAtHrs24h%12 || 12
+  const finishAtHrs12h = finishAtHrs24h % 12 || 12;
   const finishAtMins = finishAt.getMinutes();
   const meridiem = finishAtHrs24h >= 12 ? " PM " : " AM ";
 

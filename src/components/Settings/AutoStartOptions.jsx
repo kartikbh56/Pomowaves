@@ -1,20 +1,20 @@
 /* eslint-disable react/prop-types */
-export default function AutoStartOptions({ userTimers, setUserTimers }) {
+export default function AutoStartOptions({ timerSettings, setTimerSettings }) {
   const autoStart = [
     {
       name: "Breaks",
-      preset: userTimers.autoStartBreaks,
-      onToggle: () => setUserTimers({
-        ...userTimers,
-        autoStartBreaks: !userTimers.autoStartBreaks,
+      preset: timerSettings.autoStartBreaks,
+      onToggle: () => setTimerSettings({
+        ...timerSettings,
+        autoStartBreaks: !timerSettings.autoStartBreaks,
       }),
     },
     {
       name: "Pomodoros",
-      preset: userTimers.autoStartPomodoros,
-      onToggle: () => setUserTimers({
-        ...userTimers,
-        autoStartPomodoros: !userTimers.autoStartPomodoros,
+      preset: timerSettings.autoStartPomodoros,
+      onToggle: () => setTimerSettings({
+        ...timerSettings,
+        autoStartPomodoros: !timerSettings.autoStartPomodoros,
       }),
     },
   ];
@@ -22,24 +22,10 @@ export default function AutoStartOptions({ userTimers, setUserTimers }) {
     <>
       {autoStart.map((a, i) => (
         <div className="autoStartOption" key={a.name}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: a.name === "Pomodoros" ? "56%" : "47%",
-            }}
-          >
+          <div>
             Auto Start {a.name}
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "22%",
-            }}
-          >
+          <div>
             <div className="container">
               <input
                 type="checkbox"
