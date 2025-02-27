@@ -1,33 +1,64 @@
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
+import { useState, useEffect, useMemo } from "react";
 import MonthSelector from "../timelineSelector/MonthSelector";
+import TaskWiseStats from "./charts/TaskWiseStats";
+import MonthWiseStats from "./charts/MonthWise";
+import { fetchTimelineOnDate } from "../../../../api/db";
 export default function MonthView() {
-  const data = [];
+  const [dayOfTheMonth, setDayOfTheMonth] = useState(new Date());
+
+  const firstDayOfTheMonth = useMemo(
+    () =>
+      new Date(
+        dayOfTheMonth.getFullYear(),
+        dayOfTheMonth.getMonth(),
+        1,
+        0,
+        0,
+        0
+      ),
+    [dayOfTheMonth]
+  );
+
+  const lastDayOfTheMonth = useMemo(
+    () =>
+      new Date(
+        dayOfTheMonth.getFullYear(),
+        dayOfTheMonth.getMonth() + 1,
+        0, // Passing 0 as the day gives the last day of the previous month, which in this case is the last day of the current month.
+        23,
+        59,
+        59
+      ),
+    [dayOfTheMonth]
+  );
+
+  const [data, setData] = useState([]);
+  console.log({ firstDayOfTheMonth, lastDayOfTheMonth });
+  useEffect(() => {
+    const id = setTimeout(() => {
+      // setData([])
+      fetchTimelineOnDate(firstDayOfTheMonth, lastDayOfTheMonth).then(
+        (data) => {
+          setData(data.documents);
+        }
+      );
+    }, 500);
+    return () => clearTimeout(id);
+  }, [firstDayOfTheMonth, lastDayOfTheMonth]);
+
+  console.log({ firstDayOfTheMonth, lastDayOfTheMonth });
   return (
     <>
-      <MonthSelector />
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis dataKey="minutes" />
-          <Tooltip />
-          <Bar
-            type="monotone"
-            dataKey="minutes"
-            stroke="#CD5C5C"
-            fill="#f2938d"
-            fillOpacity={0.7}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+      <MonthSelector
+        dayOfTheMonth={dayOfTheMonth}
+        setDayOfTheMonth={setDayOfTheMonth}
+      />
+      <MonthWiseStats
+        data={data}
+        firstDayOfTheMonth={firstDayOfTheMonth}
+        lastDayOfTheMonth={lastDayOfTheMonth}
+      />
+      <TaskWiseStats data={data} />
     </>
   );
 }

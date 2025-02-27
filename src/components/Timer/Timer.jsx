@@ -25,7 +25,7 @@ export default function Timer() {
   const { countdownState, dispatchCountdown } = useContext(CountdownContext);
   const { tasksState, dispatchTasks } = useContext(TasksContext);
   const {
-    reportsState: { $id },
+    reportsState: { $id, minutesFocused },
     dispatchReports,
   } = useContext(ReportsContext);
 
@@ -101,7 +101,8 @@ export default function Timer() {
         };
         const minutes = Math.round(
           (report.endedAt - report.startedAt) / (1000 * 60)
-        );
+        ) + minutesFocused
+        console.log("%c","background-color:white;",minutes)
         // reports
         dispatchReports({
           type: "addReport",

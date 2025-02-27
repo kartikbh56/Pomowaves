@@ -40,7 +40,7 @@ export async function fetchTasks() {
 export function addTask(task, taskId) {
   let promise = databases.createDocument(
     databaseId,
-    tasksCollectionId,  
+    tasksCollectionId,
     taskId,
     task,
     [
@@ -182,14 +182,15 @@ export async function fetchTimeline(limit, lastId) {
   return docs;
 }
 
-export async function fetchTimelineOnDate(startOfTheDay, endOfTheDay) {
+export async function fetchTimelineOnDate(fromDate, toDate) {
   const docs = await databases.listDocuments(databaseId, timeLineCollectionId, [
     Query.and([
-      Query.lessThan("$createdAt", endOfTheDay),
-      Query.greaterThan("$createdAt", startOfTheDay),
+      Query.lessThan("$createdAt", toDate),
+      Query.greaterThan("$createdAt", fromDate),
     ]),
+    Query.limit(5000),
   ]);
-  console.log("timeline", docs);
+  console.log("timeline from ", fromDate,toDate, docs);
   return docs;
 }
 
@@ -260,5 +261,6 @@ export async function updateReport(reportsDocumentId, modification) {
     reportsDocumentId,
     modification
   );
-  console.log("updated reports settings", result);
+  // console.log("updated reports settings", result);
+  return result;
 }

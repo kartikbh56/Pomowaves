@@ -1,7 +1,7 @@
 export const initialReports = {
   minutesFocused: 0, // total hours
-  daysAccessed: 0, // fetched from the DB
-  dayStreak: 0, // fetched from the DB
+  daysAccessed: 1, // fetched from the DB
+  dayStreak: 1, // fetched from the DB
   timeLine: [], //fetched from the DB and updated from client side as well as in the DB
   totalDocs: 0,
 };
@@ -33,6 +33,7 @@ export function reportsReducer(reportsState, action) {
     case "addReport":
       return {
         ...reportsState,
+        minutesFocused:action.minutesFocused,
         timeLine: [
           {
             id: action.id,
@@ -42,7 +43,6 @@ export function reportsReducer(reportsState, action) {
           },
           ...reportsState.timeLine,
         ],
-        minutesFocused:action.minutesFocused
       };
     case "deleteEntry":
       return {

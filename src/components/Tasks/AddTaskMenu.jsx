@@ -27,7 +27,7 @@ export default function AddTaskMenu({ setAddOption }) {
           // add the currentTask document in the collection (currentTask document contains the id of one of the tasks in the task list which is marked as current task)
           // and then update the currentTask, and the created document's id for further update operations on currentTask
           addCurrentTask(newTask.id).then((newCurrentTask) => {
-            console.log("newCurrentTask", newCurrentTask);
+            // console.log("newCurrentTask", newCurrentTask);
             dispatchTasks({
               type: "fetchCurrentTask",
               currentTask: newCurrentTask?.currentTaskId,

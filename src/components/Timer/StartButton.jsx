@@ -30,7 +30,7 @@ export default function StartButton({ firstClick }) {
   const { tasksState, dispatchTasks } = useContext(TasksContext);
 
   const {
-    reportsState: { $id },
+    reportsState: { $id, minutesFocused },
     dispatchReports,
   } = useContext(ReportsContext);
 
@@ -91,7 +91,7 @@ export default function StartButton({ firstClick }) {
         };
         const minutes = Math.round(
           (report.endedAt - report.startedAt) / (1000 * 60)
-        );
+        ) + minutesFocused
         dispatchReports({
           type: "addReport",
           ...report,
@@ -110,7 +110,7 @@ export default function StartButton({ firstClick }) {
         status: "started",
         startedAt: Date.now(),
       });
-      console.log("timerSettingsDocumentId", timerSettingsDocumentId);
+      // console.log("timerSettingsDocumentId", timerSettingsDocumentId);
 
       updateTimerSettings(timerSettingsDocumentId, {
         startedAt: new Date(),

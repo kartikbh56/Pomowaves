@@ -1,25 +1,27 @@
-import { useState } from "react";
+/* eslint-disable react/prop-types */
 import TimelineController from "./TimeLineController";
+import { formatMonth } from "../../../../utils/formatDate";
 
-export default function MonthSelector() {
-  const [dayOfTheMonth, setDayOfTheMonth] = useState(new Date());
-  function formatMonth(dayOfTheMonth) {
-    return dayOfTheMonth.toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
-  }
+export default function MonthSelector({ dayOfTheMonth, setDayOfTheMonth }) {
   function handleNextMonth() {
-    const nextMonth = new Date(dayOfTheMonth);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    nextMonth.setDate(1);
+    // const nextMonth = new Date(dayOftheMonth)
+    // nextMonth.setMonth(nextMonth.getMonth() + 1);
+    // nextMonth.setDate(1);
+    const nextMonth = new Date(
+      dayOfTheMonth.getFullYear(),
+      dayOfTheMonth.getMonth() + 1,
+    );
     setDayOfTheMonth(nextMonth);
   }
   function handlePrevMonth() {
-    const nextMonth = new Date(dayOfTheMonth);
-    nextMonth.setMonth(nextMonth.getMonth() - 1);
-    nextMonth.setDate(1);
-    setDayOfTheMonth(nextMonth);
+    // const nextMonth = new Date(dayOfTheMonth);
+    // nextMonth.setMonth(nextMonth.getMonth() - 1);
+    // nextMonth.setDate(1);
+    const prevMonth = new Date(
+      dayOfTheMonth.getFullYear(),
+      dayOfTheMonth.getMonth() - 1,
+    );
+    setDayOfTheMonth(prevMonth);
   }
   return (
     <TimelineController

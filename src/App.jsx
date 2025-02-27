@@ -72,7 +72,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       const currentUser = await getCurrentUser();
-      console.log("currentUser", currentUser);
+      // console.log("currentUser", currentUser);
       setUser(currentUser);
       setLoading(false);
     };
@@ -126,7 +126,7 @@ function App() {
     });
 
     fetchReports().then((data) => {
-      console.log("this is what got for you", data);
+      // console.log("this is what got for you", data);
       if (!data?.$id) {
         // if there's no document in the collection.
         // create one for the user and update the states
@@ -134,12 +134,9 @@ function App() {
           minutesFocused: reportsState.minutesFocused,
           daysAccessed: reportsState.daysAccessed,
           dayStreak: reportsState.dayStreak,
+          lastAccessed: new Date(),
         };
         createReport(reports).then((data) => {
-          console.log(
-            "%c created reports ",
-            "background: red; color: white; font-weight: bold; padding: 5px;"
-          );
           dispatchReports({
             type: "initialFetchSummary",
             report: { ...data },
@@ -147,11 +144,6 @@ function App() {
         });
       } else {
         // if already exists
-        console.log("reports data 📃", data);
-        dispatchReports({
-          type: "initialFetchSummary",
-          report: data,
-        });
 
         const today = new Date();
         const lastAccessed = new Date(data.lastAccessed || new Date());
@@ -160,13 +152,21 @@ function App() {
         let daysAccessed = data.daysAccessed;
 
         // this is calculated next day of lastAccessed day, if this day is equal to the current day, then increment the streak.
-        const nextDay = new Date(lastAccessed);
-        nextDay.setDate(lastAccessed.getDate() + 1);
+        const nextDay = new Date(
+          lastAccessed.getFullYear(),
+          lastAccessed.getMonth(),
+          lastAccessed.getDate() + 1
+        );
 
+        console.log(
+          "%c last accessed",
+          "color:red;",
+          lastAccessed.toDateString()
+        );
         if (nextDay.toDateString() === today.toDateString()) {
           streak = streak + 1;
-        } else if (today > lastAccessed) {
-          streak = 1;
+        } else if (Math.floor((today - lastAccessed) / (1000 * 60 * 60)) > 24) {
+          streak = 1; // reset the streak if lastAccessed is more than 24 hours ago
         }
 
         daysAccessed =
@@ -174,16 +174,21 @@ function App() {
             ? daysAccessed + 1
             : daysAccessed;
 
+        // console.log("Updated daysAccessed and dayStreak",{daysAccessed,streak})
         updateReport(data.$id, {
           dayStreak: streak,
           daysAccessed: daysAccessed,
           lastAccessed: new Date(),
         }).then((data) => {
-          console.log("updated reports", data);
-        });
-        dispatchReports({
-          type: "updateReports",
-          report: { streak: streak, daysAccessed: daysAccessed },
+          console.log("%c updated reports", "color:yellow;", data);
+          dispatchReports({
+            type: "updateReports",
+            report: {
+              dayStreak: data.dayStreak,
+              daysAccessed: data.daysAccessed,
+              minutesFocused: data.minutesFocused,
+            },
+          });
         });
       }
     });

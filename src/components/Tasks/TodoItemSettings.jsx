@@ -37,7 +37,7 @@ export default function TodoItemSettings({ toggleOptions, todo }) {
         tasks.length <= 1
           ? ""
           : tasks[currentTaskIndex + 1] || tasks[currentTask - 1] || tasks[0];
-      console.log({ currentTaskDocumentID, currentTaskIndex, nextCurrentTask });
+      // console.log({ currentTaskDocumentID, currentTaskIndex, nextCurrentTask });
       updateCurrentTask(currentTaskDocumentID, nextCurrentTask?.id || "");
       dispatchTasks({ type: "switchTask", id: nextCurrentTask?.id });
     }

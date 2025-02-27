@@ -7,11 +7,11 @@ export default function TimelineController({
   }) {
     return (
       <div className="timeline-controller">
-        <button onClick={prevBtnHandler} title="Previous day">
+        <button onClick={prevBtnHandler}>
           &lt;
         </button>
         <span>{formatFunction(currentTimeLine)}</span>
-        <button onClick={nextBtnHandler} title="Next day">
+        <button onClick={nextBtnHandler}>
           {" "}
           &gt;
         </button>

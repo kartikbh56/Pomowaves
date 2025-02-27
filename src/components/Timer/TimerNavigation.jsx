@@ -12,7 +12,7 @@ export default function TimerNavigation({ firstClick }) {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
   const { tasksState } = useContext(TasksContext);
   const {
-    reportsState: { $id },
+    reportsState: { $id, minutesFocused },
     dispatchReports,
   } = useContext(ReportsContext);
   const { $id: timerSettingsDocumentId } = timerState;
@@ -22,66 +22,68 @@ export default function TimerNavigation({ firstClick }) {
     fontWeight: "bold",
     backgroundColor: "rgba(0, 0, 0, 0.15)",
   };
+  function handleClick(btn) {
+    dispatchTimerState({
+      type: "changeMode",
+      mode: btn,
+      status: "initial",
+      secsCompletedAtPause: 0,
+      startedAt: null,
+    });
+    //db
+    updateTimerSettings(timerSettingsDocumentId, {
+      mode: btn,
+      status: "initial",
+      secsCompletedAtPause: 0,
+      startedAt: null,
+    });
+
+    dispatchCountdown({
+      type: "setCountdown",
+      secondsRemaining: timerState[btn] * 60,
+    });
+
+    const currentTask = tasksState.tasks?.find(
+      (t) => t.id === tasksState.currentTask
+    );
+    const currentTaskName = currentTask?.task;
+
+    if (
+      timerState.mode === "pomodoro" &&
+      timerState.status != "initial" &&
+      Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0
+    ) {
+      // If you reset the timer (), add a report only if the focus time is more than 0
+      const report = {
+        id: crypto.randomUUID(),
+        task: currentTaskName || "No task",
+        startedAt: timerState.startedAt,
+        endedAt: Date.now(),
+      };
+      const minutes =
+        Math.round((report.endedAt - report.startedAt) / (1000 * 60)) +
+        minutesFocused;
+      dispatchReports({
+        type: "addReport",
+        ...report,
+        minuteFocused: minutes,
+      });
+      updateReport($id, { minutesFocused: minutes });
+
+      addTimeLine({
+        ...report,
+        startedAt: new Date(report.startedAt),
+        endedAt: new Date(report.endedAt),
+      });
+    }
+    firstClick.current = false;
+  }
+
   const buttons = ["pomodoro", "shortBreak", "longBreak"].map((btn) => (
     <button
       style={mode === btn ? selected : {}}
       key={btn}
-      onClick={() => {
-        dispatchTimerState({
-          type: "changeMode",
-          mode: btn,
-          status: "initial",
-          secsCompletedAtPause: 0,
-          startedAt: null,
-        });
-        //db
-        updateTimerSettings(timerSettingsDocumentId, {
-          mode: btn,
-          status: "initial",
-          secsCompletedAtPause: 0,
-          startedAt: null,
-        });
-
-        dispatchCountdown({
-          type: "setCountdown",
-          secondsRemaining: timerState[btn] * 60,
-        });
-
-        const currentTask = tasksState.tasks?.find(
-          (t) => t.id === tasksState.currentTask
-        );
-        const currentTaskName = currentTask?.task;
-
-        if (
-          timerState.mode === "pomodoro" &&
-          timerState.status != "initial" &&
-          Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0
-        ) {
-          // If you reset the timer (), add a report only if the focus time is more than 0
-          const report = {
-            id: crypto.randomUUID(),
-            task: currentTaskName || "No task",
-            startedAt: timerState.startedAt,
-            endedAt: Date.now(),
-          };
-          const minutes = Math.round(
-            (report.endedAt - report.startedAt) / (1000 * 60)
-          );
-          dispatchReports({
-            type: "addReport",
-            ...report,
-            minuteFocused: minutes,
-          });
-          updateReport($id, { minutesFocused: minutes });
-
-          addTimeLine({
-            ...report,
-            startedAt: new Date(report.startedAt),
-            endedAt: new Date(report.endedAt),
-          });
-        }
-        firstClick.current = false;
-      }}
+      onClick={() => handleClick(btn)}
     >
       {btn === "pomodoro" && "Pomodoro"}
       {btn === "shortBreak" && "Short Break"}
