@@ -139,7 +139,7 @@ function App() {
         createReport(reports).then((data) => {
           dispatchReports({
             type: "initialFetchSummary",
-            report: { ...data },
+            report: data ,
           });
         });
       } else {
@@ -182,12 +182,8 @@ function App() {
         }).then((data) => {
           console.log("%c updated reports", "color:yellow;", data);
           dispatchReports({
-            type: "updateReports",
-            report: {
-              dayStreak: data.dayStreak,
-              daysAccessed: data.daysAccessed,
-              minutesFocused: data.minutesFocused,
-            },
+            type: "initialFetchSummary",
+            report: data ,
           });
         });
       }

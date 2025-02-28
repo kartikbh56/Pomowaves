@@ -1,12 +1,29 @@
 import { useContext } from "react";
-import { TimerContext, TasksContext } from "../../contexts/context";
+import {
+  TimerContext,
+  TasksContext,
+  ReportsContext,
+} from "../../contexts/context";
+import { updateTimerSettings } from "../../api/db";
 export default function CurrentTask() {
   const {
-    tasksState: { tasks, currentTask }
+    tasksState: { tasks, currentTask },
   } = useContext(TasksContext);
   const {
-    timerState: { completedPomodoros, mode }
+    timerState: { completedPomodoros, mode, $id },
+    dispatchTimerState
   } = useContext(TimerContext);
+
+  const {
+    reportsState: { lastAccessed },
+  } = useContext(ReportsContext);
+
+  // reset completedPomodoros every day
+  if (new Date(lastAccessed).toDateString() !== new Date().toDateString()) {
+    updateTimerSettings($id, {
+      completedPomodoros: 0,
+    }).then(()=>dispatchTimerState({type:"resetCompletedPomodoros",completedPomodoros:0}))
+  }
 
   const currentTaskName = tasks.find((e) => e.id === currentTask)?.task;
 
