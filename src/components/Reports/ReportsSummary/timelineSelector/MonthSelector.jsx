@@ -9,9 +9,9 @@ export default function MonthSelector({ dayOfTheMonth, setDayOfTheMonth }) {
     // nextMonth.setDate(1);
     const nextMonth = new Date(
       dayOfTheMonth.getFullYear(),
-      dayOfTheMonth.getMonth() + 1,
+      dayOfTheMonth.getMonth() + 1
     );
-    setDayOfTheMonth(nextMonth);
+    if (nextMonth < new Date()) setDayOfTheMonth(nextMonth);
   }
   function handlePrevMonth() {
     // const nextMonth = new Date(dayOfTheMonth);
@@ -19,7 +19,7 @@ export default function MonthSelector({ dayOfTheMonth, setDayOfTheMonth }) {
     // nextMonth.setDate(1);
     const prevMonth = new Date(
       dayOfTheMonth.getFullYear(),
-      dayOfTheMonth.getMonth() - 1,
+      dayOfTheMonth.getMonth() - 1
     );
     setDayOfTheMonth(prevMonth);
   }

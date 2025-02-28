@@ -5,7 +5,7 @@ import { fetchTimelineOnDate } from "../../../../api/db";
 
 export default function DayView() {
   const [selectedDate, setSelectedDate] = useState(
-    new Date("Fri Feb 16 2025 00:00:00 GMT+0530")
+    new Date()
   );
 
   

@@ -1,18 +1,18 @@
 /* eslint-disable react/prop-types */
 import TimelineController from "./TimeLineController";
-import {formatWeek} from "../../../../utils/formatDate";
+import { formatWeek } from "../../../../utils/formatDate";
 
-export default function WeekPicker({dayOfTheWeek, setDayOfTheWeek}) {
+export default function WeekPicker({ dayOfTheWeek, setDayOfTheWeek }) {
   const handlePrevWeek = () => {
-    const newDate = new Date(dayOfTheWeek)
-    newDate.setDate(newDate.getDate() - 7)
-    setDayOfTheWeek(newDate)
+    const newDate = new Date(dayOfTheWeek);
+    newDate.setDate(newDate.getDate() - 7);
+    setDayOfTheWeek(newDate);
   };
 
   const handleNextWeek = () => {
-    const newDate = new Date(dayOfTheWeek)
-    newDate.setDate(newDate.getDate() + 7)
-    setDayOfTheWeek(newDate)
+    const newDate = new Date(dayOfTheWeek);
+    newDate.setDate(newDate.getDate() + 7);
+    if (newDate < new Date()) setDayOfTheWeek(newDate);
   };
 
   return (
