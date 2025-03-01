@@ -7,18 +7,13 @@ body {
   font-weight: 400;
   color: white;
   transition: background-color 0.5s linear;
-  /* Centers the image */
 }
-
 
 .app {
   border-radius: 5px;
   padding: 15px;
   max-width: 650px;
   margin: auto;
-  /* background-color: #00000027; */
-  height: 100vh;
-  /* margin-bottom: 5px; */
 }
 
 button,
@@ -106,12 +101,10 @@ header {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 600px;
-  height: 35vh;
   margin: auto;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  padding-top: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding-top: 40px;
   padding-bottom: 40px;
   border-radius: 8px;
   background-color: rgba(31, 31, 31, 0.113);
@@ -217,7 +210,7 @@ header {
   top: 0px;
   left: 0px;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   z-index: 2147483647;
   pointer-events: auto;
   display: flex;
@@ -225,7 +218,8 @@ header {
   align-items: center;
   padding: 10px;
   box-sizing: border-box;
-  animation: fadeIn 0.3s forwards;
+  animation: fadeIn 0.1s forwards;
+  overflow: auto;
   opacity: 1;
 }
 
@@ -235,7 +229,7 @@ header {
   color: #747171;
   font-weight: bold;
   border-radius: 15px;
-  max-width: 540px;
+  max-width: 500px;
   position: relative;
   animation: slideInFromTop .3s forwards;
   transform: translateY(0%);
@@ -433,7 +427,7 @@ header {
 
 .task-container {
   position: relative;
-  max-width: 550px;
+  width: 100%;
   margin: auto;
   margin-top: 10px;
   font-family: Nunito;
@@ -444,7 +438,6 @@ header {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 500px;
   margin: auto;
   margin-top: 20px;
   margin-bottom: 10px;
@@ -486,23 +479,25 @@ header {
 .todo-container {
   width: 100%;
   margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns per row */
+  gap:10px;
 }
 
 .todo-item {
   background-color: #fff;
-  border-radius: 7px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 15px;
+  margin: 2px;
+  padding: 12px;
   overflow: hidden;
   box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.1);
   position: relative;
-  transition: transform 0.1s ease-in-out;
+  transition: all 0.1s linear;
 }
 
 .todo-item:hover {
-  transform: translateX(1px);
+  transform: translateX(2px);
 }
 
 .menu-container {
@@ -510,10 +505,50 @@ header {
   border-radius: 7px;
   padding: 10px 25px;
   box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
   margin: auto;
   margin-top: 10px;
   animation: 0.1s ease-in-out 0s 1 normal none running expand;
+}
+
+.menu {
+  width: 220px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.229);
+  padding: 5px 0;
+  top: 0;
+  z-index: 2;
+  position: absolute;
+  right: 0;
+  top:30px;
+}
+
+.menu-item:hover {
+  background: #f5f5f5;
+}
+
+.menu-item i {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #666;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.3s;
+  border-radius: 4px;
+}
+
+.menu-item .icon {
+  margin-right: 12px; /* Add spacing between icon and text */
+  font-size: 16px;
+  color: #666;
 }
 
 @keyframes expand {
@@ -553,13 +588,11 @@ header {
 
 .task-selected {
   border-left: 10px solid rgb(75, 75, 75);
-  transform: translateX(2px);
   transition: all 0.2s linear;
 }
 
 .task-opt {
   opacity: 0.4;
-  border: 1px solid #5555556b;
   border-radius: 4px;
   padding: 4px;
   background-color: rgba(0, 0, 0, 0.044);
@@ -570,7 +603,7 @@ header {
   width: 15px;
   height: 15px;
   border: 2px solid rgb(244, 221, 221);
-  background-color: rgb(244, 221, 221);
+  background-color: rgb(248, 199, 199);
   margin-right: 10px;
   border-radius: 10px;
 }
@@ -587,7 +620,7 @@ header {
 .menu-container-header-input {
   border-radius: 4px;
   font-size: 22px;
-  padding: 15px 0px;
+  padding: 10px 0px;
   box-shadow: none;
   border: none;
   color: rgb(85, 85, 85);
@@ -686,7 +719,6 @@ header {
 
 .add-task {
   box-sizing: border-box;
-  max-width: 550px;
   margin: auto;
   height: 64px;
   background-color: rgba(0, 0, 0, 0.1);
@@ -747,7 +779,6 @@ header {
   align-items: center;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.1);
-  max-width: 525px;
   display: flex;
   flex-direction: row;
   align-items: center;

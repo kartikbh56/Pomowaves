@@ -10,6 +10,7 @@ export const initialTimerState = {
   completedPomodoros: 0,
   startedAt: null, // Date.now()
   secsCompletedAtPause: 0,
+  lastAccessed:new Date()
 };
 
 export function timerReducer(timerState, action) {

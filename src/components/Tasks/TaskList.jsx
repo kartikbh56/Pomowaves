@@ -2,14 +2,13 @@
 import { useContext, useState } from "react";
 import TaskMenu from "./TaskMenu";
 import { TasksContext } from "../../contexts/context";
-import Progress from "../Progress";
+import Progress from "../Progress"; 
 export default function TaskList() {
   const {
     tasksState: { tasks },
   } = useContext(TasksContext);
 
   const [options, setOptions] = useState(false);
-
 
   const totalPomodoros = tasks.reduce(
     (acc, cur) => ({
@@ -19,9 +18,9 @@ export default function TaskList() {
     { estimated: 0, completed: 0 }
   );
 
-
-  const overallTasksProgress = totalPomodoros.estimated ? (totalPomodoros.completed * 100) / totalPomodoros.estimated : 0;
-
+  const overallTasksProgress = totalPomodoros.estimated
+    ? (totalPomodoros.completed * 100) / totalPomodoros.estimated
+    : 0;
 
   const toggleOptions = () => setOptions(!options);
 
@@ -30,20 +29,35 @@ export default function TaskList() {
       <div className="tasks-heading">
         <div>Tasks</div>
         <button className="btn btn-options" onClick={toggleOptions}>
-          <img src="icons/options.png"></img>
+          {/* <img src="icons/options.png"></img> */}
+          <SlOptionsVertical style={{ color: "white" }} />
         </button>
       </div>
       <Progress percentage={Math.round(overallTasksProgress)} />
-        {options && <TaskListOptions/>}
+      {options && <Menu />}
       <TaskMenu />
     </div>
   );
 }
 
-function TaskListOptions(){
-  return(
-    <div className="tasklist-options">
+import { FaTrash, FaList, FaCheck } from "react-icons/fa";
+import { SlOptionsVertical } from "react-icons/sl";
 
+const menuItems = [
+  { icon: <FaList />, text: "Reset tasks Progress" },
+  { icon: <FaCheck />, text: "Clear finished tasks" },
+  { icon: <FaTrash />, text: "Clear all tasks" },
+];
+
+const Menu = () => {
+  return (
+    <div className="menu">
+      {menuItems.map((item, index) => (
+        <div key={index} className="menu-item">
+          <span className="icon">{item.icon}</span>
+          <span>{item.text}</span>
+        </div>
+      ))}
     </div>
-  )
-}
+  );
+};

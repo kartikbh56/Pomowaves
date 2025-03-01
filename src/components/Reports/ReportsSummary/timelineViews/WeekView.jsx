@@ -6,12 +6,13 @@ import { fetchTimelineOnDate } from "../../../../api/db";
 export default function WeekView() {
   const [dayOfTheWeek, setDayOfTheWeek] = useState(new Date());
 
+  // Calculate the first day of the week (Monday)
   const firstDayOfTheWeek = useMemo(
     () =>
       new Date(
         dayOfTheWeek.getFullYear(),
         dayOfTheWeek.getMonth(),
-        dayOfTheWeek.getDate() - (dayOfTheWeek.getDay() || 7) + 1,
+        dayOfTheWeek.getDate() - dayOfTheWeek.getDay() + 1,
         0,
         0,
         0
@@ -19,24 +20,24 @@ export default function WeekView() {
     [dayOfTheWeek]
   );
 
+  // Calculate the last day of the week (Sunday)
   const lastDayOfTheWeek = useMemo(
     () =>
       new Date(
-        dayOfTheWeek.getFullYear(),
-        dayOfTheWeek.getMonth(),
+        firstDayOfTheWeek.getFullYear(),
+        firstDayOfTheWeek.getMonth(),
         firstDayOfTheWeek.getDate() + 6,
         23,
         59,
         59
       ),
-    [dayOfTheWeek, firstDayOfTheWeek]
+    [firstDayOfTheWeek]
   );
 
-  console.log({ firstDayOfTheWeek, lastDayOfTheWeek });
+  // console.log({ firstDayOfTheWeek, lastDayOfTheWeek });
 
   const [data, setData] = useState([]);
   useEffect(() => {
-    // setData([])
     const id = setTimeout(() => {
       fetchTimelineOnDate(firstDayOfTheWeek, lastDayOfTheWeek).then((data) => {
         setData(data.documents);
@@ -50,6 +51,8 @@ export default function WeekView() {
       <WeekSelector
         dayOfTheWeek={dayOfTheWeek}
         setDayOfTheWeek={setDayOfTheWeek}
+        firstDayOfTheWeek={firstDayOfTheWeek}
+        lastDayOfTheWeek={lastDayOfTheWeek}
       />
       <WeekWiseStats data={data} firstDayOfTheWeek={firstDayOfTheWeek} />
       <TaskWiseStats data={data} />

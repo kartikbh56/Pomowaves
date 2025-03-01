@@ -32,12 +32,13 @@ export default function DaySelector({ selectedDate, setSelectedDate }) {
       setSelectedDate(newDate);
   }
 
+  const formattedDate = formatDay(selectedDate)
+
   return (
     <TimelineController
-      currentTimeLine={selectedDate}
+      formattedDate={formattedDate}
       prevBtnHandler={handlePrevDay}
       nextBtnHandler={handleNextDay}
-      formatFunction={formatDay}
     />
   );
 }

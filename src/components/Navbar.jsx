@@ -3,7 +3,9 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { IsOpenContext } from "../contexts/context";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../api/auth";
-
+import { ImStatsBars } from "react-icons/im";
+import { LuSettings2 } from "react-icons/lu";
+import { FiLogIn } from "react-icons/fi";
 function Logo() {
   return (
     <div className="logo">
@@ -16,7 +18,7 @@ function Logo() {
 function MenuButton({ icon, label, onClick }) {
   return (
     <button className="btn" onClick={onClick}>
-      <img src={icon} alt={`${label} Icon`} />
+       {icon}
       <span>{label}</span>
     </button>
   );
@@ -31,7 +33,8 @@ function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
           <div className="user-email">{user?.email || "User"}</div>
           <button id="logout-button" onClick={onLogout}>
             <div style={{ display: "flex", alignItems: "center", justifyContent:"center" }}>
-              <img src="icons/enter.png" alt="Logout Icon" />
+              {/* <img src="icons/enter.png" alt="Logout Icon" /> */}
+              <FiLogIn style={{margin:5}}/>
               <span>Logout</span>
             </div>
           </button>
@@ -86,17 +89,16 @@ export default function Navbar({ user }) {
   return (
     <header>
       <Logo />
-
       <div className="buttons">
         <MenuButton
-          icon="icons/report.png"
-          label="Report"
+          icon=<ImStatsBars />
+          label="Reports"
           onClick={() => handleToggleMenu("reports")}
         />
 
         <MenuButton
-          icon="icons/settings.png"
-          label="Setting"
+          icon=<LuSettings2/>
+          label="Settings"
           onClick={() => handleToggleMenu("settings")}
         />
 

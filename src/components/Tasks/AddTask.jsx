@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import AddTaskMenu from "./AddTaskMenu";
+import { IoIosAddCircle } from "react-icons/io";
 
 export default function AddTask() {
     const [addOption, setAddOption] = useState(false);
@@ -10,7 +11,7 @@ export default function AddTask() {
           <AddTaskMenu setAddOption={setAddOption} />
         ) : (
           <div className="add-task" onClick={() => setAddOption(true)}>
-            <img src="icons/add.png" />
+            <IoIosAddCircle size={25} style={{margin:"5px"}}/>
             Add Task
           </div>
         )}

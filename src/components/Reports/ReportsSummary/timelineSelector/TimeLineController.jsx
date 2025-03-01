@@ -1,16 +1,15 @@
 /* eslint-disable react/prop-types */
 export default function TimelineController({
-    currentTimeLine,
+  formattedDate,
     prevBtnHandler,
     nextBtnHandler,
-    formatFunction,
   }) {
     return (
       <div className="timeline-controller">
         <button onClick={prevBtnHandler}>
           &lt;
         </button>
-        <span>{formatFunction(currentTimeLine)}</span>
+        <span>{formattedDate}</span>
         <button onClick={nextBtnHandler}>
           {" "}
           &gt;

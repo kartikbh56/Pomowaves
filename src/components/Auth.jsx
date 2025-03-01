@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginWithGoogle, getCurrentUser } from "../api/auth.js";
+import { FiLogIn } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -35,11 +37,16 @@ const Auth = () => {
         <h1>Pomowaves</h1>
         <div className="button-container">
           <button className="signin-btn" onClick={handleGoogleLogin}>
-            <img src="/icons/google.png" alt="Google logo" />
+            {/* <img src="/icons/google.png" alt="Google logo" /> */}
+            <FcGoogle size={20} />
+
+
             Sign up with Google
           </button>
           <button className="signin-btn" onClick={handleTestLogin}>
-            <img src="/icons/enter.png" alt="Google logo" />
+            {/* <img src="/icons/enter.png" alt="Google logo" /> */}
+            <FiLogIn />
+
             Login with Test Account
           </button>
         </div>

@@ -53,7 +53,7 @@ function MonthWiseCharts({ data }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid strokeDasharray="1 1" />
         <XAxis
           dataKey="day"
           tickFormatter={(data) =>

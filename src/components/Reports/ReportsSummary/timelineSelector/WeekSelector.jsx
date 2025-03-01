@@ -2,7 +2,12 @@
 import TimelineController from "./TimeLineController";
 import { formatWeek } from "../../../../utils/formatDate";
 
-export default function WeekPicker({ dayOfTheWeek, setDayOfTheWeek }) {
+export default function WeekSelector({
+  dayOfTheWeek,
+  setDayOfTheWeek,
+  firstDayOfTheWeek,
+  lastDayOfTheWeek,
+}) {
   const handlePrevWeek = () => {
     const newDate = new Date(dayOfTheWeek);
     newDate.setDate(newDate.getDate() - 7);
@@ -15,12 +20,13 @@ export default function WeekPicker({ dayOfTheWeek, setDayOfTheWeek }) {
     if (newDate < new Date()) setDayOfTheWeek(newDate);
   };
 
+  const formattedDate = formatWeek(firstDayOfTheWeek, lastDayOfTheWeek);
+  
   return (
     <TimelineController
-      currentTimeLine={dayOfTheWeek}
+      formattedDate={formattedDate}
       prevBtnHandler={handlePrevWeek}
       nextBtnHandler={handleNextWeek}
-      formatFunction={formatWeek}
     />
   );
 }

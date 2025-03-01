@@ -23,12 +23,13 @@ export default function MonthSelector({ dayOfTheMonth, setDayOfTheMonth }) {
     );
     setDayOfTheMonth(prevMonth);
   }
+
+  const formattedDate = formatMonth(dayOfTheMonth)
   return (
     <TimelineController
-      currentTimeLine={dayOfTheMonth}
+      formattedDate={formattedDate}
       prevBtnHandler={handlePrevMonth}
       nextBtnHandler={handleNextMonth}
-      formatFunction={formatMonth}
     />
   );
 }

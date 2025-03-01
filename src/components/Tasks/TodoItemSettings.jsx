@@ -44,9 +44,12 @@ export default function TodoItemSettings({ toggleOptions, todo }) {
     deleteTask(todo.id);
   }
   return (
+    <div className="modalview" onClick={toggleOptions}>
     <div
-      className="menu-container"
+      className="todo-item"
+      style={{width:"500px",padding:"15px",transform:"none"}}
       onKeyDown={(e) => e.key === "Enter" && saveSettings()}
+      onClick={(e) => e.stopPropagation()}
     >
       <input
         className="menu-container-header-input"
@@ -137,6 +140,7 @@ export default function TodoItemSettings({ toggleOptions, todo }) {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

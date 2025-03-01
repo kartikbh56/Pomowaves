@@ -42,6 +42,7 @@ import {
   fetchTimerSettings,
   initialFetchTimeline,
   updateReport,
+  updateTimerSettings,
 } from "./api/db.js";
 
 function App() {
@@ -90,16 +91,22 @@ function App() {
             timerSettings: {
               ...data,
               startedAt: data.startedAt, // it's null because, it's being created for the first time.
+              lastAccessed: new Date(data.lastAccessed),
             },
           });
         });
       } else {
         // if already exists
+        console.log(
+          "timer settings was last accessed at ",
+          new Date(data.lastAccessed)
+        );
         dispatchTimerState({
           type: "initializeTimerSettings",
           timerSettings: {
             ...data,
             startedAt: new Date(data.startedAt).getTime() || null,
+            lastAccessed: new Date(data.lastAccessed),
             // new Date(null).getTime() is 0, so, if `startedAt` fetched form db is null, then store it as it is in the state, converting it to Date() causes inaccurate time calculations.
           },
         });
@@ -110,6 +117,23 @@ function App() {
           type: "setCountdown",
           secondsRemaining: secondsRemaining,
         });
+
+        // reset completedPomodoros every day
+        if (
+          new Date(data.lastAccessed).toDateString() !==
+          new Date().toDateString()
+        ) {
+          console.log("resetting completedPomodoros")
+          updateTimerSettings(data.$id, {
+            completedPomodoros: 0,
+          }).then(() =>
+            dispatchTimerState({
+              type: "resetCompletedPomodoros",
+              completedPomodoros: 0,
+            })
+          );
+        }
+        updateTimerSettings(data.$id, { lastAccessed: new Date() });
       }
     });
 
@@ -139,7 +163,7 @@ function App() {
         createReport(reports).then((data) => {
           dispatchReports({
             type: "initialFetchSummary",
-            report: data ,
+            report: data,
           });
         });
       } else {
@@ -183,7 +207,7 @@ function App() {
           console.log("%c updated reports", "color:yellow;", data);
           dispatchReports({
             type: "initialFetchSummary",
-            report: data ,
+            report: data,
           });
         });
       }
