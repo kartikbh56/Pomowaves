@@ -1,7 +1,7 @@
 export const initialTasksState = {
   tasks: [],
   currentTask: "",
-  currentTaskDocumentID : "" // for db
+  currentTaskDocumentID: "", // for db
 };
 
 export function tasksReducer(tasksState, action) {
@@ -15,7 +15,7 @@ export function tasksReducer(tasksState, action) {
       return {
         ...tasksState,
         currentTask: action.currentTask,
-        currentTaskDocumentID:action.currentTaskDocumentID
+        currentTaskDocumentID: action.currentTaskDocumentID,
       };
     case "sortTasks":
       return {
@@ -51,12 +51,19 @@ export function tasksReducer(tasksState, action) {
       return {
         ...tasksState,
         tasks: [...tasksState.tasks, action.newTask],
-        currentTask: action.currentTask || tasksState.currentTask
+        currentTask: action.currentTask || tasksState.currentTask,
       };
     case "deleteTask":
       return {
         ...tasksState,
         tasks: tasksState.tasks.filter((task) => task.id !== action.id),
+      };
+    case "reset_task_progress":
+      return {
+        ...tasksState,
+        tasks: tasksState.tasks.map((t) =>
+          t.$id === action.$id ? { ...t, completed: 0 } : t
+        ),
       };
   }
 }

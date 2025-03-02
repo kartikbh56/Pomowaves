@@ -68,6 +68,7 @@ export async function updateTask(documentId, modification) {
     modification
   );
   console.log("Task updated", result);
+  return result;
 }
 
 export async function deleteTask(documentId) {
@@ -189,7 +190,7 @@ export async function fetchTimelineOnDate(fromDate, toDate) {
     ]),
     Query.limit(5000),
   ]);
-  console.log("timeline from ", fromDate,toDate, docs);
+  console.log("timeline from ", fromDate, toDate, docs);
   return docs;
 }
 
