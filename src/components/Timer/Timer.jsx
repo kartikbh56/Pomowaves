@@ -96,7 +96,7 @@ export default function Timer() {
         const report = {
           id: crypto.randomUUID(),
           task: currentTaskName || "No task",
-          startedAt: timerState.startedAt,
+          startedAt: timerState.startedAt, 
           endedAt: timerState.startedAt + timerState.pomodoro * 60 * 1000,
         };
         const minutes = Math.round(

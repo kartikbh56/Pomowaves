@@ -100,8 +100,8 @@ export default function StartButton({ firstClick }) {
         updateReport($id, { minutesFocused: minutes });
         addTimeLine({
           ...report,
-          startedAt: new Date(report.startedAt),
-          endedAt: new Date(report.endedAt),
+          startedAt: new Date(report.startedAt).toISOString(),
+          endedAt: new Date(report.endedAt).toISOString(),
         });
       }
     } else {
@@ -113,7 +113,7 @@ export default function StartButton({ firstClick }) {
       // console.log("timerSettingsDocumentId", timerSettingsDocumentId);
 
       updateTimerSettings(timerSettingsDocumentId, {
-        startedAt: new Date(),
+        startedAt: new Date().toISOString(),
         status: "started",
       });
     }

@@ -67,7 +67,6 @@ export async function updateTask(documentId, modification) {
     documentId, // documentId
     modification
   );
-
   console.log("Task updated", result);
 }
 

@@ -56,7 +56,7 @@ function TaskWiseChart({ taskWiseData }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={taskWiseData}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid strokeDasharray="1 1" />
         <XAxis dataKey="task" fontSize={10} interval={0} />
         <YAxis dataKey="minutes" type="number" fontSize={10} interval={0} />
         <Tooltip

@@ -72,8 +72,8 @@ export default function TimerNavigation({ firstClick }) {
 
       addTimeLine({
         ...report,
-        startedAt: new Date(report.startedAt),
-        endedAt: new Date(report.endedAt),
+        startedAt: new Date(report.startedAt).toISOString(),
+        endedAt: new Date(report.endedAt).toISOString(),
       });
     }
     firstClick.current = false;
