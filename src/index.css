@@ -132,7 +132,7 @@ header {
 }
 
 .time {
-  font-size: 110px;
+  font-size: 100px;
   font-weight: 900;
   margin: auto;
   display: flex;
@@ -143,6 +143,15 @@ header {
   margin-bottom: 10px;
 }
 
+@media (max-width: 600px) {
+  .time{
+    font-size: 80px;
+  }
+}
+
+.todo-item:hover {
+  transform: translateX(2px);
+}
 
 .startbtn {
   cursor: pointer;
