@@ -24,7 +24,11 @@ const Auth = () => {
   };
 
   const handleTestLogin = async () => {
-    await testUserLogin().then(() => navigate("/"));
+    const user = await testUserLogin()
+    if(user){
+      navigate("/")
+      window.location.reload()
+    }
   };
 
   return (

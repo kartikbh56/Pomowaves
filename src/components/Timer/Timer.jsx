@@ -17,7 +17,8 @@ import {
   updateCurrentTask,
   updateTask,
   updateTimerSettings,
-  updateReport
+  updateReport,
+  updateLeaderboardProgress,
 } from "../../api/db";
 
 export default function Timer() {
@@ -25,7 +26,7 @@ export default function Timer() {
   const { countdownState, dispatchCountdown } = useContext(CountdownContext);
   const { tasksState, dispatchTasks } = useContext(TasksContext);
   const {
-    reportsState: { $id, minutesFocused },
+    reportsState: { $id, minutesFocused, leaderBoardUserDocumentId },
     dispatchReports,
   } = useContext(ReportsContext);
 
@@ -96,13 +97,13 @@ export default function Timer() {
         const report = {
           id: crypto.randomUUID(),
           task: currentTaskName || "No task",
-          startedAt: timerState.startedAt, 
+          startedAt: timerState.startedAt,
           endedAt: timerState.startedAt + timerState.pomodoro * 60 * 1000,
         };
-        const minutes = Math.round(
-          (report.endedAt - report.startedAt) / (1000 * 60)
-        ) + minutesFocused
-        console.log("%c","background-color:white;",minutes)
+        const minutes =
+          Math.round((report.endedAt - report.startedAt) / (1000 * 60)) +
+          minutesFocused;
+        console.log("%c", "background-color:white;", minutes);
         // reports
         dispatchReports({
           type: "addReport",
@@ -113,9 +114,12 @@ export default function Timer() {
           // (startedAt + timerState[mode]*60*1000 - Date.now() < 0) which triggers "finishPomodoro" / "finishBreak"
           // that works fine, but updating endedAt:Date.now() adds into reports that the pomodoro is finished beyond the timerState timers. so,
           // timerState.startedAt + timerState.pomodoro * 60 * 1000 works perfectly.
-          minutesFocused:minutes
+          minutesFocused: minutes,
         });
         updateReport($id, { minutesFocused: minutes });
+        updateLeaderboardProgress(leaderBoardUserDocumentId, {
+          minutesFocused: minutes,
+        });
 
         addTimeLine({
           ...report,

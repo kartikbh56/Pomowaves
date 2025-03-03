@@ -36,10 +36,12 @@ import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
 
 import { getCurrentUser } from "./api/auth.js";
 import {
+  addUserToLeaderboard,
   createReport,
   createTimerSettings,
   fetchReports,
   fetchTimerSettings,
+  getUserFromLeaderboard,
   initialFetchTimeline,
   updateReport,
   updateTimerSettings,
@@ -71,15 +73,29 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const currentUser = await getCurrentUser();
+    getCurrentUser().then((currentUser) => {
       setUser(currentUser);
       setLoading(false);
-    };
-    checkAuth();
-  }, []);
+      getUserFromLeaderboard(currentUser?.$id).then((data) => {
+        // console.log("leaderboard data", data)
+        if (!data.length) {
+          console.log("adding user to leaderboard");
+          addUserToLeaderboard(currentUser.$id, currentUser.name).then(
+            (data) => {
+              dispatchReports({
+                type: "leadboardUserDocId",
+                leaderBoardUserDocumentId: data.$id,
+              });
+            }
+          );
+        }
+        dispatchReports({
+          type: "leadboardUserDocId",
+          leaderBoardUserDocumentId: data[0]?.$id,
+        });
+      });
+    });
 
-  useEffect(() => {
     fetchTimerSettings().then((data) => {
       if (!data?.$id) {
         // if there's no document in the collection.
@@ -238,7 +254,7 @@ function App() {
                     <IsOpenContext.Provider
                       value={{ isOpenState, dispatchIsOpen }}
                     >
-                      <Navbar user={user} />
+                      <Navbar user={user} setUser={setUser} />
                       <CountdownContext.Provider
                         value={{ countdownState, dispatchCountdown }}
                       >

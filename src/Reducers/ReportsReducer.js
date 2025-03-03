@@ -4,6 +4,7 @@ export const initialReports = {
   dayStreak: 1, // fetched from the DB
   timeLine: [], //fetched from the DB and updated from client side as well as in the DB
   totalDocs: 0,
+  leaderBoardUserDocumentId:null
 };
 
 export function reportsReducer(reportsState, action) {
@@ -50,5 +51,10 @@ export function reportsReducer(reportsState, action) {
         timeLine: action.timeLine,
         totalDocs:reportsState.totalDocs - 1
       };
+    case "leadboardUserDocId":
+      return {
+        ...reportsState,
+        leaderBoardUserDocumentId:action.leaderBoardUserDocumentId
+      }
   }
 }

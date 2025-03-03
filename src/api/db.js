@@ -25,6 +25,8 @@ const timerSettingsCollectionId = import.meta.env
 const timeLineCollectionId = import.meta.env
   .VITE_APPWRITE_TIMELINE_COLLECTION_ID;
 const reportsCollectionId = import.meta.env.VITE_APPWRITE_REPORTS_COLLECTION_ID;
+const leaderboardCollectionId = import.meta.env
+  .VITE_APPWRITE_LEADERBOARD_COLLECTION_ID;
 
 // Tasks
 export async function fetchTasks() {
@@ -263,4 +265,48 @@ export async function updateReport(reportsDocumentId, modification) {
   );
   // console.log("updated reports settings", result);
   return result;
+}
+
+/******************************************************************/
+// Leaderboard
+
+export async function fetchleaderboardEntries() {
+  const docs = await databases.listDocuments(
+    databaseId,
+    leaderboardCollectionId,
+    [Query.orderDesc("minutesFocused")]
+  );
+  console.log("leaderboard", docs);
+  return docs?.documents;
+}
+
+export async function getUserFromLeaderboard(userId) {
+  const result = await databases.listDocuments(
+    databaseId, // databaseId
+    leaderboardCollectionId, // collectionId
+    [Query.equal("userId", [userId])]
+  );
+  return result?.documents;
+}
+
+export async function addUserToLeaderboard(userId, name) {
+  const result = await databases.createDocument(
+    databaseId, // databaseId
+    leaderboardCollectionId, // collectionId
+    ID.unique(), // documentId
+    { userId: userId, name: name, minutesFocused: 0 } // data
+  );
+  console.log(result);
+  return result
+}
+
+
+export async function updateLeaderboardProgress(documentId,modification) {
+  const result = await databases.updateDocument(
+    databaseId, // databaseId
+    leaderboardCollectionId, // collectionId
+    documentId, // documentId
+    modification
+  )
+  console.log(result)
 }

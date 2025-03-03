@@ -1,5 +1,10 @@
 /* eslint-disable react/prop-types */
-import { addTimeLine, updateTimerSettings, updateReport } from "../../api/db";
+import {
+  addTimeLine,
+  updateTimerSettings,
+  updateReport,
+  updateLeaderboardProgress,
+} from "../../api/db";
 import {
   TimerContext,
   CountdownContext,
@@ -12,7 +17,7 @@ export default function TimerNavigation({ firstClick }) {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
   const { tasksState } = useContext(TasksContext);
   const {
-    reportsState: { $id, minutesFocused },
+    reportsState: { $id, minutesFocused, leaderBoardUserDocumentId },
     dispatchReports,
   } = useContext(ReportsContext);
   const { $id: timerSettingsDocumentId } = timerState;
@@ -69,6 +74,9 @@ export default function TimerNavigation({ firstClick }) {
         minuteFocused: minutes,
       });
       updateReport($id, { minutesFocused: minutes });
+      updateLeaderboardProgress(leaderBoardUserDocumentId, {
+        minutesFocused: minutes,
+      });
 
       addTimeLine({
         ...report,

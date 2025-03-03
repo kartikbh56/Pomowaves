@@ -8,6 +8,7 @@ import {
 } from "../../contexts/context";
 import {
   addTimeLine,
+  updateLeaderboardProgress,
   updateReport,
   updateTask,
   updateTimerSettings,
@@ -30,7 +31,7 @@ export default function StartButton({ firstClick }) {
   const { tasksState, dispatchTasks } = useContext(TasksContext);
 
   const {
-    reportsState: { $id, minutesFocused },
+    reportsState: { $id, minutesFocused, leaderBoardUserDocumentId },
     dispatchReports,
   } = useContext(ReportsContext);
 
@@ -89,15 +90,18 @@ export default function StartButton({ firstClick }) {
           startedAt: startedAt,
           endedAt: Date.now(),
         };
-        const minutes = Math.round(
-          (report.endedAt - report.startedAt) / (1000 * 60)
-        ) + minutesFocused
+        const minutes =
+          Math.round((report.endedAt - report.startedAt) / (1000 * 60)) +
+          minutesFocused;
         dispatchReports({
           type: "addReport",
           ...report,
           minutesFocused: minutes,
         });
         updateReport($id, { minutesFocused: minutes });
+        updateLeaderboardProgress(leaderBoardUserDocumentId, {
+          minutesFocused: minutes,
+        });
         addTimeLine({
           ...report,
           startedAt: new Date(report.startedAt).toISOString(),

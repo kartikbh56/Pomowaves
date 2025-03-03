@@ -18,7 +18,7 @@ function Logo() {
 function MenuButton({ icon, label, onClick }) {
   return (
     <button className="btn" onClick={onClick}>
-       {icon}
+      {icon}
       <span>{label}</span>
     </button>
   );
@@ -32,9 +32,15 @@ function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
           <div className="user-name">{user?.name || "User"}</div>
           <div className="user-email">{user?.email || "User"}</div>
           <button id="logout-button" onClick={onLogout}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent:"center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               {/* <img src="icons/enter.png" alt="Logout Icon" /> */}
-              <FiLogIn style={{margin:5}}/>
+              <FiLogIn style={{ margin: 5 }} />
               <span>Logout</span>
             </div>
           </button>
@@ -44,7 +50,7 @@ function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
   );
 }
 
-export default function Navbar({ user }) {
+export default function Navbar({ user, setUser }) {
   const { dispatchIsOpen } = useContext(IsOpenContext);
   const navigate = useNavigate();
 
@@ -63,6 +69,7 @@ export default function Navbar({ user }) {
     try {
       await logout();
       navigate("/auth");
+      setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -97,7 +104,7 @@ export default function Navbar({ user }) {
         />
 
         <MenuButton
-          icon=<LuSettings2/>
+          icon=<LuSettings2 />
           label="Settings"
           onClick={() => handleToggleMenu("settings")}
         />
@@ -117,5 +124,3 @@ export default function Navbar({ user }) {
     </header>
   );
 }
-
-
