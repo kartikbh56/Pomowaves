@@ -29,7 +29,7 @@ export default function TodoItemSettings({ toggleOptions, todo }) {
   }
 
   function deleteCurrentTask() {
-    dispatchTasks({ type: "deleteTask", id: todo.id }); // delete the task from task list
+    dispatchTasks({ type: "deleteTask", id: todo.id || todo.$id }); // delete the task from task list
     if (todo.id === currentTask) {
       // if the task to be deleted is currentTask
       const currentTaskIndex = tasks.findIndex((t) => t.id === todo.id);

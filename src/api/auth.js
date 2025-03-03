@@ -1,19 +1,22 @@
 import { account } from "./appwrite";
 
 // Function to handle Google OAuth
-export const loginWithGoogle = async () => {
-  try {
-    const session = await account.createOAuth2Session(
-      "google",
-      import.meta.env.VITE_GOOGLE_SUCCESS_URL, // Success URL (your app's URL)
-      import.meta.env.VITE_GOOGLE_FAILURE_URL // Failure URL
-    );
-    return session;
-  } catch (error) {
-    console.error("OAuth error:", error);
-    throw error;
-  }
-};
+export async function loginWithGoogle() {
+  const session = await account.createOAuth2Session(
+    "google",
+    import.meta.env.VITE_GOOGLE_SUCCESS_URL, // Success URL (your app's URL)
+    import.meta.env.VITE_GOOGLE_FAILURE_URL // Failure URL
+  );
+  return session;
+}
+
+export async function testUserLogin() {
+  const session = await account.createEmailPasswordSession(
+    "test@example.com",
+    "test@123"
+  );
+  return session;
+}
 
 // Function to get current session
 export const getCurrentUser = async () => {

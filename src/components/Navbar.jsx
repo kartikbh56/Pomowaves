@@ -104,7 +104,7 @@ export default function Navbar({ user }) {
 
         <button className="btn" onClick={handleToggleDropdown}>
           <div className="avatar">{user.name.charAt(0)}</div>
-          <span>{user.name.slice(0,user.name.indexOf(" "))}</span>
+          <span>{user.name.split(" ")[0]}</span>
         </button>
 
         <UserDropdown

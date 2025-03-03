@@ -73,7 +73,6 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       const currentUser = await getCurrentUser();
-      // console.log("currentUser", currentUser);
       setUser(currentUser);
       setLoading(false);
     };
@@ -86,7 +85,7 @@ function App() {
         // if there's no document in the collection.
         // create one for the user and update the states
         createTimerSettings({
-          timerState,
+          ...timerState,
           lastAccessed: new Date().toISOString(),
         }).then((data) => {
           dispatchTimerState({

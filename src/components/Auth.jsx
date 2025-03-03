@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginWithGoogle, getCurrentUser } from "../api/auth.js";
+import { loginWithGoogle, getCurrentUser, testUserLogin } from "../api/auth.js";
 import { FiLogIn } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 
@@ -20,16 +20,12 @@ const Auth = () => {
   };
 
   const handleGoogleLogin = async () => {
-    try {
-      await loginWithGoogle();
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+    await loginWithGoogle();
   };
 
-  function handleTestLogin (){
-    
-  }
+  const handleTestLogin = async () => {
+    await testUserLogin().then(() => navigate("/"));
+  };
 
   return (
     <div className="auth-container">
@@ -39,14 +35,11 @@ const Auth = () => {
           <button className="signin-btn" onClick={handleGoogleLogin}>
             {/* <img src="/icons/google.png" alt="Google logo" /> */}
             <FcGoogle size={20} />
-
-
             Sign up with Google
           </button>
           <button className="signin-btn" onClick={handleTestLogin}>
             {/* <img src="/icons/enter.png" alt="Google logo" /> */}
             <FiLogIn />
-
             Login with Test Account
           </button>
         </div>
@@ -70,8 +63,8 @@ const Auth = () => {
             productive way to work and study. The technique uses a timer to
             break down work into intervals, traditionally 25 minutes in length,
             separated by short breaks. Each interval is known as a pomodoro,
-            from the Italian word for {"tomato"}, after the tomato-shaped kitchen
-            timer that Cirillo used as a university student. -{" "}
+            from the Italian word for {"tomato"}, after the tomato-shaped
+            kitchen timer that Cirillo used as a university student. -{" "}
             <a
               target="_blank"
               href="https://en.wikipedia.org/wiki/Pomodoro_Technique"

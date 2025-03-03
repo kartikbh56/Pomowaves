@@ -63,7 +63,7 @@ function Menu({ toggleOptions }) {
     toggleOptions();
     tasks.forEach((task) => {
       deleteTask(task.$id).then(() =>
-        dispatchTasks({ type: "deleteTask", id: task.$id })
+        dispatchTasks({ type: "deleteTask", id: task.$id || task.id })
       );
     });
   }
@@ -85,7 +85,7 @@ function Menu({ toggleOptions }) {
           dispatchTasks({ type: "switchTask", id: nextCurrentTask?.id });
         }
         deleteTask(task.$id).then(() =>
-          dispatchTasks({ type: "deleteTask", id: task.$id })
+          dispatchTasks({ type: "deleteTask", id: task.$id || task.id })
         );
       }
     });
