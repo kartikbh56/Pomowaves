@@ -4,15 +4,17 @@ import {
   updateTimerSettings,
   updateReport,
   updateLeaderboardProgress,
-} from "../../api/db";
+} from "../../appwrite backend/db";
 import {
   TimerContext,
   CountdownContext,
   ReportsContext,
   TasksContext,
 } from "../../contexts/context";
+import { formatMinutes, getMinutes } from "../../utils/formatDate";
 import { getColor } from "../../utils/getColor";
 import { useEffect, useContext } from "react";
+import { AddTimelineToast } from "../Toast";
 export default function TimerNavigation({ firstClick }) {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
   const { tasksState } = useContext(TasksContext);
@@ -82,7 +84,12 @@ export default function TimerNavigation({ firstClick }) {
         ...report,
         startedAt: new Date(report.startedAt).toISOString(),
         endedAt: new Date(report.endedAt).toISOString(),
-      });
+      }).then(() =>
+        AddTimelineToast(
+          report.task,
+          formatMinutes(getMinutes(report.startedAt, report.endedAt))
+        )
+      );
     }
     firstClick.current = false;
   }

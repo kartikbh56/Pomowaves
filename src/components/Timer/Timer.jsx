@@ -19,7 +19,9 @@ import {
   updateTimerSettings,
   updateReport,
   updateLeaderboardProgress,
-} from "../../api/db";
+} from "../../appwrite backend/db";
+import { AddTimelineToast, UpdateTaskToast } from "../Toast";
+import { formatMinutes, getMinutes } from "../../utils/formatDate";
 
 export default function Timer() {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
@@ -80,6 +82,9 @@ export default function Timer() {
           completedPomodoros % timerState.longBreakInterval === 0
             ? "longBreak"
             : "shortBreak";
+        new Notification(`Time to take a ${nextMode.split("B")[0]} break!`, {
+          icon: "icons/logo.png",
+        });
         const secondsRemaining = timerState[nextMode] * 60;
 
         const newTasks = tasksState.tasks.map((task) =>
@@ -125,7 +130,10 @@ export default function Timer() {
           ...report,
           startedAt: new Date(report.startedAt),
           endedAt: new Date(report.endedAt),
-        });
+        }).then(()=>AddTimelineToast(
+          report.task,
+          formatMinutes(getMinutes(report.startedAt, report.endedAt))
+        ))
 
         dispatchCountdown({
           type: "setCountdown",
@@ -155,8 +163,11 @@ export default function Timer() {
         tasksState.currentTask &&
           updateTask(tasksState.currentTask, {
             completed: currentTask?.completed + 1,
-          });
+          }).then((data) => UpdateTaskToast(data.task));
       } else {
+        new Notification(`Time to Focus!`, {
+          icon: "icons/logo.png",
+        });
         const nextMode = "pomodoro";
         const secondsRemaining = timerState[nextMode] * 60;
         const currentTask =
@@ -192,10 +203,12 @@ export default function Timer() {
           type: "setTasks",
           currentTask: nextTask,
         });
-        updateCurrentTask(
-          tasksState.currentTaskDocumentID,
-          nextTask || currentTask.id || ""
-        );
+        if (nextTask !== tasksState.currentTask) {
+          updateCurrentTask(
+            tasksState.currentTaskDocumentID,
+            nextTask || currentTask.id || ""
+          );
+        }
       }
       new Audio("sounds/button.mp3").play();
     }

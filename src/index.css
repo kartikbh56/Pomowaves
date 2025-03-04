@@ -206,7 +206,7 @@ header {
   left: 0px;
   width: 100%;
   height: 100%;
-  z-index: 2147483647;
+  z-index: 100;
   pointer-events: auto;
   display: flex;
   justify-content: center;
@@ -1260,7 +1260,7 @@ header {
   background-color: rgba(255, 255, 255, 0.881);
   text-align: center;
   color: rgb(214, 112, 112);
-  padding: 1px;
+  padding: 2px;
 }
 
 .loader {

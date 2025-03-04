@@ -34,7 +34,7 @@ import { isOpenReducer, initialIsOpenState } from "./Reducers/IsOpenReducer.js";
 
 import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
 
-import { getCurrentUser } from "./api/auth.js";
+import { getCurrentUser } from "./appwrite backend/auth.js";
 import {
   addUserToLeaderboard,
   createReport,
@@ -45,7 +45,9 @@ import {
   initialFetchTimeline,
   updateReport,
   updateTimerSettings,
-} from "./api/db.js";
+} from "./appwrite backend/db.js";
+import {  AddTimelineToast, StreakToast } from "./components/Toast.jsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [timerState, dispatchTimerState] = useReducer(
@@ -73,6 +75,11 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    Notification.requestPermission();
+  }, []);
+
+  useEffect(() => {
+    AddTimelineToast("React.js","1h 35m")    
     getCurrentUser().then((currentUser) => {
       setUser(currentUser);
       setLoading(false);
@@ -130,7 +137,6 @@ function App() {
         });
         const secondsRemaining =
           data[data.mode] * 60 - data.secsCompletedAtPause;
-
         dispatchCountdown({
           type: "setCountdown",
           secondsRemaining: secondsRemaining,
@@ -181,6 +187,7 @@ function App() {
           lastAccessed: new Date().toISOString(),
         };
         createReport(reports).then((data) => {
+          StreakToast(data.daysStreak);
           dispatchReports({
             type: "initialFetchSummary",
             report: { data, lastAccessed: new Date(data.lastAccessed) },
@@ -209,8 +216,10 @@ function App() {
         // );
         if (nextDay.toDateString() === today.toDateString()) {
           streak = streak + 1;
+          StreakToast(streak);
         } else if (Math.floor((today - lastAccessed) / (1000 * 60 * 60)) > 24) {
           streak = 1; // reset the streak if lastAccessed is more than 24 hours ago
+          StreakToast(streak);
         }
 
         daysAccessed =
@@ -271,6 +280,7 @@ function App() {
                     </IsOpenContext.Provider>
                   </TasksContext.Provider>
                 </TimerContext.Provider>
+                <Toaster style={{ zIndex: 1100 }}/>
               </div>
             ) : (
               <Navigate to="/auth" replace />
@@ -283,3 +293,4 @@ function App() {
 }
 
 export default App;
+

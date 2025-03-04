@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useState, useContext } from "react";
 import { TasksContext } from "../../contexts/context";
-import { deleteTask, updateCurrentTask, updateTask } from "../../api/db";
+import { deleteTask, updateCurrentTask, updateTask } from "../../appwrite backend/db";
+import { DeleteTaskToast, UpdateTaskToast } from "../Toast";
 export default function TodoItemSettings({ toggleOptions, todo }) {
   const [options, setOptions] = useState({
     taskTitle: todo.task,
@@ -23,13 +24,16 @@ export default function TodoItemSettings({ toggleOptions, todo }) {
       updateTask(todo.$id, {
         task: options.taskTitle,
         estimated: options.estimated,
-      });
+      }).then((data) => UpdateTaskToast(data.task));
       toggleOptions();
     }
   }
 
   function deleteCurrentTask() {
-    dispatchTasks({ type: "deleteTask", id: todo.id || todo.$id }); // delete the task from task list
+    deleteTask(todo.id || todo.$id).then(() => {
+      dispatchTasks({ type: "deleteTask", id: todo.id || todo.$id });
+      DeleteTaskToast(todo.task);
+    }); // delete the task from task list
     if (todo.id === currentTask) {
       // if the task to be deleted is currentTask
       const currentTaskIndex = tasks.findIndex((t) => t.id === todo.id);
@@ -38,109 +42,110 @@ export default function TodoItemSettings({ toggleOptions, todo }) {
           ? ""
           : tasks[currentTaskIndex + 1] || tasks[currentTask - 1] || tasks[0];
       // console.log({ currentTaskDocumentID, currentTaskIndex, nextCurrentTask });
-      updateCurrentTask(currentTaskDocumentID, nextCurrentTask?.id || "");
+      updateCurrentTask(currentTaskDocumentID, nextCurrentTask?.id || "")
       dispatchTasks({ type: "switchTask", id: nextCurrentTask?.id });
     }
-    deleteTask(todo.id);
   }
   return (
     <div className="modalview" onClick={toggleOptions}>
-    <div
-      className="todo-item"
-      style={{width:"500px",padding:"15px",transform:"none"}}
-      onKeyDown={(e) => e.key === "Enter" && saveSettings()}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <input
-        className="menu-container-header-input"
-        value={taskTitle}
-        onChange={(e) => setOptions({ ...options, taskTitle: e.target.value })}
-        autoFocus={true}
-      />
-      <div>
-        <div className="todo-label">Completed / Estimated Pomodoros</div>
-        <div className="pomodoro-inputs">
-          <div
-            className="task-settings-input"
-            style={{
-              opacity: "0.7",
-              fontWeight: 800,
-              padding: "7px",
-              cursor: "no-drop",
-            }}
-          >
-            {todo.completed}
-          </div>
-          <span> / </span>
-          <input
-            className="task-settings-input"
-            type="number"
-            id="estimated"
-            value={estimated}
-            min={todo.completed}
-            onChange={(e) =>
-              setOptions({
-                ...options,
-                estimated:
-                  Number(e.target.value) >= todo.completed
-                    ? Number(e.target.value)
-                    : options.estimated,
-              })
-            }
-          />
-          <button
-            className="up-down-btn"
-            onClick={() =>
-              setOptions({ ...options, estimated: options.estimated + 1 })
-            }
-          >
-            <img src="icons/caret-up.png" />
-          </button>
-          <button
-            className="up-down-btn"
-            onClick={() =>
-              setOptions({
-                ...options,
-                estimated:
-                  options.estimated - 1 >= todo.completed &&
-                  options.estimated - 1 >= 1
-                    ? options.estimated - 1
-                    : options.estimated,
-              })
-            }
-          >
-            <img src="icons/caret-down.png" />
-          </button>
-        </div>
-        <div className="form-actions">
-          <div>
-            <button
-              type="button"
-              className="delete-button"
-              onClick={deleteCurrentTask}
+      <div
+        className="todo-item"
+        style={{ width: "500px", padding: "15px", transform: "none" }}
+        onKeyDown={(e) => e.key === "Enter" && saveSettings()}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <input
+          className="menu-container-header-input"
+          value={taskTitle}
+          onChange={(e) =>
+            setOptions({ ...options, taskTitle: e.target.value })
+          }
+          autoFocus={true}
+        />
+        <div>
+          <div className="todo-label">Completed / Estimated Pomodoros</div>
+          <div className="pomodoro-inputs">
+            <div
+              className="task-settings-input"
+              style={{
+                opacity: "0.7",
+                fontWeight: 800,
+                padding: "7px",
+                cursor: "no-drop",
+              }}
             >
-              Delete
+              {todo.completed}
+            </div>
+            <span> / </span>
+            <input
+              className="task-settings-input"
+              type="number"
+              id="estimated"
+              value={estimated}
+              min={todo.completed}
+              onChange={(e) =>
+                setOptions({
+                  ...options,
+                  estimated:
+                    Number(e.target.value) >= todo.completed
+                      ? Number(e.target.value)
+                      : options.estimated,
+                })
+              }
+            />
+            <button
+              className="up-down-btn"
+              onClick={() =>
+                setOptions({ ...options, estimated: options.estimated + 1 })
+              }
+            >
+              <img src="icons/caret-up.png" />
+            </button>
+            <button
+              className="up-down-btn"
+              onClick={() =>
+                setOptions({
+                  ...options,
+                  estimated:
+                    options.estimated - 1 >= todo.completed &&
+                    options.estimated - 1 >= 1
+                      ? options.estimated - 1
+                      : options.estimated,
+                })
+              }
+            >
+              <img src="icons/caret-down.png" />
             </button>
           </div>
-          <div>
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={toggleOptions}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="save-button"
-              onClick={saveSettings}
-            >
-              Save
-            </button>
+          <div className="form-actions">
+            <div>
+              <button
+                type="button"
+                className="delete-button"
+                onClick={deleteCurrentTask}
+              >
+                Delete
+              </button>
+            </div>
+            <div>
+              <button
+                type="button"
+                className="cancel-button"
+                onClick={toggleOptions}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="save-button"
+                onClick={saveSettings}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

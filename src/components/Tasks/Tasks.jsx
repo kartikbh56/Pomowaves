@@ -4,7 +4,7 @@ import TaskList from "./TaskList";
 import AddTask from "./AddTask";
 import { useContext, useEffect } from "react";
 import { TasksContext } from "../../contexts/context";
-import { fetchTasks, fetchCurrentTask } from "../../api/db";
+import { fetchTasks, fetchCurrentTask } from "../../appwrite backend/db";
 
 export default function Tasks() {
   const { dispatchTasks } = useContext(TasksContext);

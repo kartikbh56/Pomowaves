@@ -12,8 +12,10 @@ import {
   updateReport,
   updateTask,
   updateTimerSettings,
-} from "../../api/db";
+} from "../../appwrite backend/db";
 import { getColor } from "../../utils/getColor";
+import { AddTimelineToast, UpdateTaskToast } from "../Toast";
+import { formatMinutes, getMinutes } from "../../utils/formatDate";
 
 export default function StartButton({ firstClick }) {
   const {
@@ -106,7 +108,12 @@ export default function StartButton({ firstClick }) {
           ...report,
           startedAt: new Date(report.startedAt).toISOString(),
           endedAt: new Date(report.endedAt).toISOString(),
-        });
+        }).then(() =>
+          AddTimelineToast(
+            report.task,
+            formatMinutes(getMinutes(report.startedAt, report.endedAt))
+          )
+        );
       }
     } else {
       dispatchTimerState({
@@ -143,7 +150,9 @@ export default function StartButton({ firstClick }) {
         tasks: newTasks,
         currentTask: currentTask.id,
       });
-      updateTask(currentTask.id, { estimated: currentTask.estimated + 1 });
+      updateTask(currentTask.id, { estimated: currentTask.estimated + 1 }).then(
+        (data) => UpdateTaskToast(data.task)
+      );
 
       dispatchTasks({ type: "sortTasks" });
     }

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginWithGoogle, getCurrentUser, testUserLogin } from "../api/auth.js";
+import { loginWithGoogle, getCurrentUser, testUserLogin } from "../appwrite backend/auth.js";
 import { FiLogIn } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 

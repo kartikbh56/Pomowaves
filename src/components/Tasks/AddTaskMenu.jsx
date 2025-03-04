@@ -2,8 +2,8 @@
 import { TasksContext } from "../../contexts/context";
 import { useContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { addCurrentTask, addTask, updateCurrentTask } from "../../api/db";
-// import { addTask } from "../../lib/appwrite";
+import { addCurrentTask, addTask, updateCurrentTask } from "../../appwrite backend/db";
+import { AddTaskToast } from "../Toast";
 
 export default function AddTaskMenu({ setAddOption }) {
   const {
@@ -36,8 +36,7 @@ export default function AddTaskMenu({ setAddOption }) {
           });
 
           // if currentTaskDocumentID already exists (fetched), then update it with the taskId of the task added just now.
-        } else 
-        updateCurrentTask(currentTaskDocumentID, newTask.id);
+        } else updateCurrentTask(currentTaskDocumentID, newTask.id);
       }
 
       dispatchTasks({
@@ -45,7 +44,7 @@ export default function AddTaskMenu({ setAddOption }) {
         newTask: newTask,
       });
       //db
-      addTask(newTask, newTask.id);
+      addTask(newTask, newTask.id).then((data) => AddTaskToast(data.task));
     }
 
     setNewTaskInputFields({ task: "", estimated: 1 }); // input fields states
@@ -53,7 +52,10 @@ export default function AddTaskMenu({ setAddOption }) {
   return (
     <div
       className="menu-container"
-      onKeyDown={(e) => e.key === "Enter" && saveSettings()}
+      onKeyDown={(e) => {
+        e.key === "Enter" && saveSettings();
+        e.key === "Escape" && setAddOption(false);
+      }}
     >
       <input
         className="menu-container-header-input"

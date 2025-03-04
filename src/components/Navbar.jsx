@@ -2,7 +2,7 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { IsOpenContext } from "../contexts/context";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../api/auth";
+import { logout } from "../appwrite backend/auth";
 import { ImStatsBars } from "react-icons/im";
 import { LuSettings2 } from "react-icons/lu";
 import { FiLogIn } from "react-icons/fi";

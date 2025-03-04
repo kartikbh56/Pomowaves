@@ -9,7 +9,8 @@ import TimeSettings from "./TimeSettings";
 import AutoStartOptions from "./AutoStartOptions";
 import LongBreakInterval from "./LongBreakInterval";
 import Footer from "./Footer";
-import { updateTimerSettings } from "../../api/db";
+import { updateTimerSettings } from "../../appwrite backend/db";
+import { SettingsSavedToast } from "../Toast";
 
 /* eslint-disable react/prop-types */
 export default function Settings() {
@@ -61,7 +62,9 @@ export default function Settings() {
         timerSettings: timerSettings,
       });
 
-      updateTimerSettings(timerSettingsDocumentId, { ...timerSettings });
+      updateTimerSettings(timerSettingsDocumentId, { ...timerSettings }).then(
+        () => SettingsSavedToast()
+      );
 
       dispatchCountdown({
         type: "setCountdown",

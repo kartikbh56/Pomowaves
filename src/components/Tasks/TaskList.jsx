@@ -5,7 +5,11 @@ import { TasksContext } from "../../contexts/context";
 import Progress from "../Progress";
 import { FaTrash, FaList, FaCheck } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
-import { deleteTask, updateCurrentTask, updateTask } from "../../api/db";
+import { deleteTask, updateCurrentTask, updateTask } from "../../appwrite backend/db";
+import {
+  DeleteTaskToast,
+  UpdateTaskToast,
+} from "../Toast";
 
 export default function TaskList() {
   const {
@@ -53,18 +57,20 @@ function Menu({ toggleOptions }) {
   function resetTasksProgress() {
     toggleOptions();
     tasks.forEach((task) => {
-      updateTask(task.$id, { completed: 0 }).then((data) =>
-        dispatchTasks({ type: "reset_task_progress", $id: data.$id })
-      );
+      updateTask(task.$id, { completed: 0 }).then((data) => {
+        dispatchTasks({ type: "reset_task_progress", $id: data.$id });
+        UpdateTaskToast(task.task);
+      });
     });
   }
 
   function clearAllTasks() {
     toggleOptions();
     tasks.forEach((task) => {
-      deleteTask(task.$id).then(() =>
-        dispatchTasks({ type: "deleteTask", id: task.$id || task.id })
-      );
+      deleteTask(task.$id || task.id).then(() => {
+        dispatchTasks({ type: "deleteTask", id: task.$id || task.id });
+        DeleteTaskToast(task.task);
+      });
     });
   }
 
@@ -81,12 +87,16 @@ function Menu({ toggleOptions }) {
                 tasks[currentTask - 1] ||
                 tasks[0];
           // console.log({ currentTaskDocumentID, currentTaskIndex, nextCurrentTask });
-          updateCurrentTask(currentTaskDocumentID, nextCurrentTask?.id || "");
+          updateCurrentTask(
+            currentTaskDocumentID,
+            nextCurrentTask?.id || ""
+          )
           dispatchTasks({ type: "switchTask", id: nextCurrentTask?.id });
         }
-        deleteTask(task.$id).then(() =>
-          dispatchTasks({ type: "deleteTask", id: task.$id || task.id })
-        );
+        deleteTask(task.$id || task.id).then(() => {
+          dispatchTasks({ type: "deleteTask", id: task.$id || task.id });
+          DeleteTaskToast(task.task);
+        });
       }
     });
   }

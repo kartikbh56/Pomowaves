@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useState, useContext, useRef } from "react";
 import { ReportsContext } from "../../../contexts/context";
-import { deleteTimeline, fetchTimeline } from "../../../api/db";
+import { deleteTimeline, fetchTimeline } from "../../../appwrite backend/db";
+import { DeleteTimelineToast } from "../../Toast";
 
 const LIMIT = 20; // Number of entries per fetch
 
-export default function TimeTracker(){
+export default function TimeTracker() {
   const {
     reportsState: { timeLine, totalDocs }, // totalDocs stored in reducer
     dispatchReports,
@@ -35,7 +36,6 @@ export default function TimeTracker(){
       }
       setLoading(false);
     });
-
   };
 
   const handleScroll = () => {
@@ -48,12 +48,13 @@ export default function TimeTracker(){
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (entry) => {
     const updatedEntries = timeLine.filter(
-      (item) => (item.$id || item.id) !== id
+      (item) => (item.$id || item.id) !== (entry.id || entry.$id)
     );
+    DeleteTimelineToast(entry.task);
     dispatchReports({ type: "deleteEntry", timeLine: updatedEntries });
-    deleteTimeline(id);
+    deleteTimeline(entry.id || entry.$id);
   };
 
   return (
@@ -74,10 +75,10 @@ export default function TimeTracker(){
               <TimeEntry
                 key={entry.$id || entry.id}
                 entry={entry}
-                onDelete={() => handleDelete(entry.$id || entry.id)}
+                onDelete={() => handleDelete(entry)}
               />
             ))}
-            {loading && <p style={{textAlign:"center"}}>Loading...</p>}
+            {loading && <p style={{ textAlign: "center" }}>Loading...</p>}
           </>
         ) : (
           <div

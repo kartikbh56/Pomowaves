@@ -39,8 +39,8 @@ export async function fetchTasks() {
   return result.documents;
 }
 
-export function addTask(task, taskId) {
-  let promise = databases.createDocument(
+export async function addTask(task, taskId) {
+  let result = await databases.createDocument(
     databaseId,
     tasksCollectionId,
     taskId,
@@ -51,15 +51,8 @@ export function addTask(task, taskId) {
       Permission.delete(Role.user(userId)), // Only this user can delete
     ]
   );
-
-  promise.then(
-    function (response) {
-      console.log("Task added: ", response);
-    },
-    function (error) {
-      console.log(error);
-    }
-  );
+  console.log(result);
+  return result;
 }
 
 export async function updateTask(documentId, modification) {
@@ -197,7 +190,7 @@ export async function fetchTimelineOnDate(fromDate, toDate) {
 }
 
 export async function addTimeLine(report) {
-  let promise = databases.createDocument(
+  let result = await databases.createDocument(
     databaseId,
     timeLineCollectionId,
     report.id,
@@ -213,14 +206,7 @@ export async function addTimeLine(report) {
     ]
   );
 
-  promise.then(
-    function (response) {
-      console.log("Timeline added: ", response);
-    },
-    function (error) {
-      console.log(error);
-    }
-  );
+  return result;
 }
 
 export async function deleteTimeline(documentId) {
@@ -297,16 +283,15 @@ export async function addUserToLeaderboard(userId, name) {
     { userId: userId, name: name, minutesFocused: 0 } // data
   );
   console.log(result);
-  return result
+  return result;
 }
 
-
-export async function updateLeaderboardProgress(documentId,modification) {
+export async function updateLeaderboardProgress(documentId, modification) {
   const result = await databases.updateDocument(
     databaseId, // databaseId
     leaderboardCollectionId, // collectionId
     documentId, // documentId
     modification
-  )
-  console.log(result)
+  );
+  console.log(result);
 }
