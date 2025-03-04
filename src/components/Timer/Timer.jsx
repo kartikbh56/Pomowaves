@@ -22,6 +22,7 @@ import {
 } from "../../appwrite backend/db";
 import { AddTimelineToast, UpdateTaskToast } from "../Toast";
 import { formatMinutes, getMinutes } from "../../utils/formatDate";
+import { sendNotification } from "../../utils/notification";
 
 export default function Timer() {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
@@ -82,9 +83,7 @@ export default function Timer() {
           completedPomodoros % timerState.longBreakInterval === 0
             ? "longBreak"
             : "shortBreak";
-        new Notification(`Time to take a ${nextMode.split("B")[0]} break!`, {
-          icon: "icons/logo.png",
-        });
+        sendNotification(`Time to take a ${nextMode.split("B")[0]} break!`);
         const secondsRemaining = timerState[nextMode] * 60;
 
         const newTasks = tasksState.tasks.map((task) =>
@@ -130,10 +129,12 @@ export default function Timer() {
           ...report,
           startedAt: new Date(report.startedAt),
           endedAt: new Date(report.endedAt),
-        }).then(()=>AddTimelineToast(
-          report.task,
-          formatMinutes(getMinutes(report.startedAt, report.endedAt))
-        ))
+        }).then(() =>
+          AddTimelineToast(
+            report.task,
+            formatMinutes(getMinutes(report.startedAt, report.endedAt))
+          )
+        );
 
         dispatchCountdown({
           type: "setCountdown",
@@ -165,9 +166,7 @@ export default function Timer() {
             completed: currentTask?.completed + 1,
           }).then((data) => UpdateTaskToast(data.task));
       } else {
-        new Notification(`Time to Focus!`, {
-          icon: "icons/logo.png",
-        });
+        sendNotification("Time to Focus!");
         const nextMode = "pomodoro";
         const secondsRemaining = timerState[nextMode] * 60;
         const currentTask =

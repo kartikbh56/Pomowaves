@@ -75,7 +75,9 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Notification.requestPermission();
+    if (Notification.permission === "default") {
+      Notification.requestPermission();
+    }
   }, []);
 
   useEffect(() => {

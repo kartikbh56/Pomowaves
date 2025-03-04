@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { TasksContext, TimerContext } from "../contexts/context";
 import { TasksFinishedToast } from "./Toast";
+import { sendNotification } from "../utils/notification";
 
 /* eslint-disable react/prop-types */
 export default function Summary() {
@@ -19,17 +20,17 @@ export default function Summary() {
 
   const remainingTasks = totalPomodoros.estimated - totalPomodoros.completed;
 
-  useEffect(()=>{
-    if(remainingTasks === 0){
-      TasksFinishedToast()
-      new Notification("You've finished all your tasks today 🎉")
-    } 
-  },[remainingTasks])
-  
-  if (remainingTasks === 0){
-    return <></>
-  } 
-  
+  useEffect(() => {
+    if (remainingTasks === 0) {
+      TasksFinishedToast();
+      sendNotification("You've finished all your tasks today 🎉");
+    }
+  }, [remainingTasks]);
+
+  if (remainingTasks === 0) {
+    return <></>;
+  }
+
   const longBreaksCount = Math.floor((remainingTasks - 1) / longBreakInterval);
 
   const shortBreaksCount = Math.floor(remainingTasks - 1 - longBreaksCount);
