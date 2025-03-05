@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState } from "react";
 import TaskMenu from "./TaskMenu";
-import { TasksContext } from "../../contexts/context";
+// import { TasksContext } from "../../contexts/context";
+import { TasksContext } from "../../contexts/TasksContextProvider";
 import Progress from "../Progress";
 import { FaTrash, FaList, FaCheck } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";

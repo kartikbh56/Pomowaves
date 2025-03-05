@@ -1,7 +1,8 @@
 import { useContext } from "react";
-import { TasksContext } from "../../contexts/context";
+// import { TasksContext } from "../../contexts/context";
 import TodoItem from "./TodoItem";
 import { updateCurrentTask } from "../../appwrite backend/db";
+import { TasksContext } from "../../contexts/TasksContextProvider";
 export default function TaskMenu() {
   const {
     tasksState: { tasks, currentTaskDocumentID },

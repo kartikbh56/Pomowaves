@@ -5,16 +5,17 @@ import {
   updateReport,
   updateLeaderboardProgress,
 } from "../../appwrite backend/db";
-import {
-  TimerContext,
-  CountdownContext,
-  ReportsContext,
-  TasksContext,
-} from "../../contexts/context";
+
+import { ReportsContext } from "../../contexts/ReportsContextProvider";
+
+import { TimerContext } from "../../contexts/TimerContextProvider";
+import { TasksContext } from "../../contexts/TasksContextProvider";
+import { CountdownContext } from "../../contexts/CountdownContext";
 import { formatMinutes, getMinutes } from "../../utils/formatDate";
 import { getColor } from "../../utils/getColor";
 import { useEffect, useContext } from "react";
 import { AddTimelineToast } from "../Toast";
+
 export default function TimerNavigation({ firstClick }) {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
   const { tasksState } = useContext(TasksContext);

@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState, useEffect, useRef } from "react";
-import { IsOpenContext } from "../contexts/context";
+import { IsOpenContext } from "../contexts/IsOpenContextProvider";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../appwrite backend/auth";
 import { ImStatsBars } from "react-icons/im";
 import { LuSettings2 } from "react-icons/lu";
 import { FiLogIn } from "react-icons/fi";
+import { UserContext } from "../contexts/UserContextProvider";
 function Logo() {
   return (
     <div className="logo">
@@ -50,7 +51,8 @@ function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
   );
 }
 
-export default function Navbar({ user, setUser }) {
+export default function Navbar() {
+  const { user, setUser } = useContext(UserContext);
   const { dispatchIsOpen } = useContext(IsOpenContext);
   const navigate = useNavigate();
 

@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { IsOpenContext } from "../../contexts/context";
+// import { IsOpenContext } from "../../contexts/context";
+import { IsOpenContext } from "../../contexts/IsOpenContextProvider";
 
 /* eslint-disable react/prop-types */
 export default function SettingsContainer({ children, saveSettings }) {

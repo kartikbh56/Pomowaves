@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useContext } from "react";
-import { TasksContext } from "../../contexts/context";
+// import { TasksContext } from "../../contexts/context";
+import { TasksContext } from "../../contexts/TasksContextProvider";
 import { SlOptionsVertical } from "react-icons/sl";
 
 export default function Todo({ todo, handleClick, toggleOptions }) {

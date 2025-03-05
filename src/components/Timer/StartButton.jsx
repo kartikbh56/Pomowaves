@@ -1,11 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useContext, useEffect, useRef } from "react";
-import {
-  CountdownContext,
-  TasksContext,
-  TimerContext,
-  ReportsContext,
-} from "../../contexts/context";
+
+import { ReportsContext } from "../../contexts/ReportsContextProvider";
+
+import { TasksContext } from "../../contexts/TasksContextProvider";
+
+import { TimerContext } from "../../contexts/TimerContextProvider";
+
+import { CountdownContext } from "../../contexts/CountdownContext";
 import {
   addTimeLine,
   updateLeaderboardProgress,

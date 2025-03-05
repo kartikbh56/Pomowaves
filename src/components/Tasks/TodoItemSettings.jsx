@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useState, useContext } from "react";
-import { TasksContext } from "../../contexts/context";
+// import { TasksContext } from "../../contexts/context";
 import { deleteTask, updateCurrentTask, updateTask } from "../../appwrite backend/db";
+import { TasksContext } from "../../contexts/TasksContextProvider";
 import { DeleteTaskToast, UpdateTaskToast } from "../Toast";
 export default function TodoItemSettings({ toggleOptions, todo }) {
   const [options, setOptions] = useState({

@@ -1,18 +1,18 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState, useContext, useReducer, useEffect } from "react";
-import { IsOpenContext, ReportsContext } from "../../contexts/context";
+import { IsOpenContext } from "../../contexts/IsOpenContextProvider";
 import SummaryView from "./ReportsSummary/SummaryView";
 import TimeLineDetails from "./DetailReports/Details";
 import LeaderBoard from "./LeaderBoard/LeaderBoard";
 import ReportsContainer from "./ReportsContainer";
 
 export default function ReportsMenu() {
-
   const [currentView, setCurrentView] = useState("Summary");
-  const { dispatchIsOpen } = useContext(IsOpenContext);
+  const { isOpenState, dispatchIsOpen } = useContext(IsOpenContext);
   const closeModal = () =>
     dispatchIsOpen({ type: "toggleMenu", menu: "reports" });
+  if (!isOpenState.reports) return <></>;
   return (
     <ReportsContainer>
       <img

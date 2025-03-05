@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 
 const toastBackgroundStyle = {
-  backgroundColor: "rgba(0, 0, 0, 0.68)",
+  backgroundColor: "rgba(0, 0, 0, 0.83)",
   color: "white",
 };
 

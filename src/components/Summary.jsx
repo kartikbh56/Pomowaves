@@ -1,7 +1,10 @@
 import { useContext, useEffect } from "react";
-import { TasksContext, TimerContext } from "../contexts/context";
+// import { TasksContext } from "../contexts/context";
 import { TasksFinishedToast } from "./Toast";
 import { sendNotification } from "../utils/notification";
+
+import { TimerContext } from "../contexts/TimerContextProvider";
+import { TasksContext } from "../contexts/TasksContextProvider";
 
 /* eslint-disable react/prop-types */
 export default function Summary() {
@@ -21,13 +24,16 @@ export default function Summary() {
   const remainingTasks = totalPomodoros.estimated - totalPomodoros.completed;
 
   useEffect(() => {
-    if (remainingTasks === 0) {
+    if (
+      tasks.length > 0 &&
+      totalPomodoros.completed >= totalPomodoros.estimated
+    ) {
       TasksFinishedToast();
       sendNotification("You've finished all your tasks today 🎉");
     }
-  }, [remainingTasks]);
+  }, [totalPomodoros.estimated, totalPomodoros.completed,tasks.length]);
 
-  if (remainingTasks === 0) {
+  if (remainingTasks === 0 || tasks.length <= 0) {
     return <></>;
   }
 

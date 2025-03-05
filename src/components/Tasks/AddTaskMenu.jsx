@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
-import { TasksContext } from "../../contexts/context";
+// import { TasksContext } from "../../contexts/context";
 import { useContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { addCurrentTask, addTask, updateCurrentTask } from "../../appwrite backend/db";
 import { AddTaskToast } from "../Toast";
+
+import { TasksContext } from "../../contexts/TasksContextProvider";
 
 export default function AddTaskMenu({ setAddOption }) {
   const {

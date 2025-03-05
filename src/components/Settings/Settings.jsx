@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
-import {
-  CountdownContext,
-  IsOpenContext,
-  TimerContext,
-} from "../../contexts/context";
+// import {
+//   // CountdownContext,
+//   IsOpenContext,
+// } from "../../contexts/context";
+import { IsOpenContext } from "../../contexts/IsOpenContextProvider";
+import { CountdownContext } from "../../contexts/CountdownContext";
 import SettingsContainer from "./SettingsContainer";
 import TimeSettings from "./TimeSettings";
 import AutoStartOptions from "./AutoStartOptions";
@@ -12,10 +13,12 @@ import Footer from "./Footer";
 import { updateTimerSettings } from "../../appwrite backend/db";
 import { SettingsSavedToast } from "../Toast";
 
+import { TimerContext } from "../../contexts/TimerContextProvider";
+
 /* eslint-disable react/prop-types */
 export default function Settings() {
   const { timerState, dispatchTimerState } = useContext(TimerContext);
-  const { dispatchIsOpen } = useContext(IsOpenContext);
+  const { isOpenState, dispatchIsOpen } = useContext(IsOpenContext);
   const { countdownState, dispatchCountdown } = useContext(CountdownContext);
   const timerSettingsDocumentId = timerState.$id;
 
@@ -73,6 +76,8 @@ export default function Settings() {
     }
     dispatchIsOpen({ type: "toggleMenu", menu: "settings" });
   }
+
+  if (!isOpenState.settings) return <></>;
   return (
     <SettingsContainer saveSettings={saveSettings}>
       <TimeSettings

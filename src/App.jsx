@@ -1,10 +1,5 @@
-import { useReducer, useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Settings from "./components/Settings/Settings.jsx";
 import Tasks from "./components/Tasks/Tasks.jsx";
 import Summary from "./components/Summary.jsx";
@@ -12,242 +7,16 @@ import Timer from "./components/Timer/Timer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Reports from "./components/Reports/ReportsMenu.jsx";
 import Auth from "./components/Auth.jsx";
-import Loader from "./components/Loader.jsx";
-import {
-  TimerContext,
-  TasksContext,
-  IsOpenContext,
-  CountdownContext,
-  ReportsContext,
-} from "./contexts/context.js";
-
-import { initialTimerState, timerReducer } from "./Reducers/TimerReducer.js";
-
-import { tasksReducer, initialTasksState } from "./Reducers/TaskReducer.js";
-
-import {
-  initialCountdownState,
-  countdownReducer,
-} from "./Reducers/CountdownReducer.js";
-
-import { isOpenReducer, initialIsOpenState } from "./Reducers/IsOpenReducer.js";
-
-import { reportsReducer, initialReports } from "./Reducers/ReportsReducer.js";
-
-import { getCurrentUser } from "./appwrite backend/auth.js";
-import {
-  addUserToLeaderboard,
-  createReport,
-  createTimerSettings,
-  fetchReports,
-  fetchTimerSettings,
-  getUserFromLeaderboard,
-  initialFetchTimeline,
-  updateReport,
-  updateTimerSettings,
-} from "./appwrite backend/db.js";
-import {  AddTimelineToast, StreakToast } from "./components/Toast.jsx";
+// import { IsOpenContextProvider } from "./contexts/context.js";
 import { Toaster } from "react-hot-toast";
+import { ContextProvider } from "./contexts/ContextProvider.jsx";
 
-function App() {
-  const [timerState, dispatchTimerState] = useReducer(
-    timerReducer,
-    initialTimerState
-  );
-  const [tasksState, dispatchTasks] = useReducer(
-    tasksReducer,
-    initialTasksState
-  );
-  const [countdownState, dispatchCountdown] = useReducer(
-    countdownReducer,
-    initialCountdownState
-  );
-  const [isOpenState, dispatchIsOpen] = useReducer(
-    isOpenReducer,
-    initialIsOpenState
-  );
-  const [reportsState, dispatchReports] = useReducer(
-    reportsReducer,
-    initialReports
-  );
-
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+export default function App() {
   useEffect(() => {
     if (Notification.permission === "default") {
       Notification.requestPermission();
     }
   }, []);
-
-  useEffect(() => {
-    AddTimelineToast("React.js","1h 35m")    
-    getCurrentUser().then((currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-      getUserFromLeaderboard(currentUser?.$id).then((data) => {
-        // console.log("leaderboard data", data)
-        if (!data.length) {
-          console.log("adding user to leaderboard");
-          addUserToLeaderboard(currentUser.$id, currentUser.name).then(
-            (data) => {
-              dispatchReports({
-                type: "leadboardUserDocId",
-                leaderBoardUserDocumentId: data.$id,
-              });
-            }
-          );
-        }
-        dispatchReports({
-          type: "leadboardUserDocId",
-          leaderBoardUserDocumentId: data[0]?.$id,
-        });
-      });
-    });
-
-    fetchTimerSettings().then((data) => {
-      if (!data?.$id) {
-        // if there's no document in the collection.
-        // create one for the user and update the states
-        createTimerSettings({
-          ...timerState,
-          lastAccessed: new Date().toISOString(),
-        }).then((data) => {
-          dispatchTimerState({
-            type: "initializeTimerSettings",
-            timerSettings: {
-              ...data,
-              startedAt: data.startedAt, // it's null because, it's being created for the first time.
-              lastAccessed: new Date(data.lastAccessed),
-            },
-          });
-        });
-      } else {
-        // if already exists
-        // console.log(
-        //   "timer settings was last accessed at ",
-        //   new Date(data.lastAccessed)
-        // );
-        dispatchTimerState({
-          type: "initializeTimerSettings",
-          timerSettings: {
-            ...data,
-            startedAt: new Date(data.startedAt).getTime() || null,
-            lastAccessed: new Date(data.lastAccessed),
-            // new Date(null).getTime() is 0, so, if `startedAt` fetched form db is null, then store it as it is in the state, converting it to Date() causes inaccurate time calculations.
-          },
-        });
-        const secondsRemaining =
-          data[data.mode] * 60 - data.secsCompletedAtPause;
-        dispatchCountdown({
-          type: "setCountdown",
-          secondsRemaining: secondsRemaining,
-        });
-
-        // reset completedPomodoros every day
-        if (
-          new Date(data.lastAccessed).toDateString() !==
-          new Date().toDateString()
-        ) {
-          console.log("resetting completedPomodoros");
-          updateTimerSettings(data.$id, {
-            completedPomodoros: 0,
-          }).then(() =>
-            dispatchTimerState({
-              type: "resetCompletedPomodoros",
-              completedPomodoros: 0,
-            })
-          );
-        }
-        updateTimerSettings(data.$id, {
-          lastAccessed: new Date().toISOString(),
-        });
-      }
-    });
-
-    initialFetchTimeline(8).then((data) => {
-      dispatchReports({
-        type: "fetchReports",
-        reports: data.documents.map((r) => ({
-          ...r,
-          startedAt: new Date(r.startedAt),
-          endedAt: new Date(r.endedAt),
-        })),
-        totalDocs: data.total,
-      });
-    });
-
-    fetchReports().then((data) => {
-      // console.log("this is what got for you", data);
-      if (!data?.$id) {
-        // if there's no document in the collection.
-        // create one for the user and update the states
-        const reports = {
-          minutesFocused: reportsState.minutesFocused,
-          daysAccessed: reportsState.daysAccessed,
-          dayStreak: reportsState.dayStreak,
-          lastAccessed: new Date().toISOString(),
-        };
-        createReport(reports).then((data) => {
-          StreakToast(data.daysStreak);
-          dispatchReports({
-            type: "initialFetchSummary",
-            report: { data, lastAccessed: new Date(data.lastAccessed) },
-          });
-        });
-      } else {
-        // if already exists
-
-        const today = new Date();
-        const lastAccessed = new Date(data.lastAccessed || new Date());
-
-        let streak = data.dayStreak;
-        let daysAccessed = data.daysAccessed;
-
-        // this is calculated next day of lastAccessed day, if this day is equal to the current day, then increment the streak.
-        const nextDay = new Date(
-          lastAccessed.getFullYear(),
-          lastAccessed.getMonth(),
-          lastAccessed.getDate() + 1
-        );
-
-        // console.log(
-        //   "%c last accessed",
-        //   "color:red;",
-        //   lastAccessed.toDateString()
-        // );
-        if (nextDay.toDateString() === today.toDateString()) {
-          streak = streak + 1;
-          StreakToast(streak);
-        } else if (Math.floor((today - lastAccessed) / (1000 * 60 * 60)) > 24) {
-          streak = 1; // reset the streak if lastAccessed is more than 24 hours ago
-          StreakToast(streak);
-        }
-
-        daysAccessed =
-          lastAccessed.getDate() !== today.getDate()
-            ? daysAccessed + 1
-            : daysAccessed;
-
-        // console.log("Updated daysAccessed and dayStreak",{daysAccessed,streak})
-        updateReport(data.$id, {
-          dayStreak: streak,
-          daysAccessed: daysAccessed,
-          lastAccessed: new Date().toISOString(),
-        }).then((data) => {
-          console.log("%c updated reports", "color:yellow;", data);
-          dispatchReports({
-            type: "initialFetchSummary",
-            report: { ...data, lastAccessed: new Date(data.lastAccessed) },
-          });
-        });
-      }
-    });
-  }, []);
-
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <Router>
@@ -256,43 +25,20 @@ function App() {
         <Route
           path="/*"
           element={
-            user ? (
-              <div className="app">
-                <TimerContext.Provider
-                  value={{ timerState, dispatchTimerState }}
-                >
-                  <TasksContext.Provider value={{ tasksState, dispatchTasks }}>
-                    <IsOpenContext.Provider
-                      value={{ isOpenState, dispatchIsOpen }}
-                    >
-                      <Navbar user={user} setUser={setUser} />
-                      <CountdownContext.Provider
-                        value={{ countdownState, dispatchCountdown }}
-                      >
-                        <ReportsContext.Provider
-                          value={{ reportsState, dispatchReports }}
-                        >
-                          {isOpenState.settings && <Settings />}
-                          {isOpenState.reports && <Reports />}
-                          <Timer />
-                          <Tasks />
-                          {tasksState.tasks.length > 0 && <Summary />}
-                        </ReportsContext.Provider>
-                      </CountdownContext.Provider>
-                    </IsOpenContext.Provider>
-                  </TasksContext.Provider>
-                </TimerContext.Provider>
-                <Toaster style={{ zIndex: 1100 }}/>
-              </div>
-            ) : (
-              <Navigate to="/auth" replace />
-            )
+            <div className="app">
+              <ContextProvider>
+                <Navbar />
+                <Settings />
+                <Reports />
+                <Timer />
+                <Tasks />
+                <Summary />
+                <Toaster style={{ zIndex: 1100 }} />
+              </ContextProvider>
+            </div>
           }
         />
       </Routes>
     </Router>
   );
 }
-
-export default App;
-
