@@ -76,11 +76,17 @@ export default function TimerNavigation({ firstClick }) {
         ...report,
         minuteFocused: minutes,
       });
-      updateReport($id, { minutesFocused: minutes });
+      updateReport($id, { minutesFocused: minutes }).then((data) =>
+        dispatchReports({
+          type: "updateReport",
+          report: { minutesFocused: data.minutesFocused },
+        })
+      );
       updateLeaderboardProgress(leaderBoardUserDocumentId, {
         minutesFocused: minutes,
       });
 
+      report.startedAt && 
       addTimeLine({
         ...report,
         startedAt: new Date(report.startedAt).toISOString(),

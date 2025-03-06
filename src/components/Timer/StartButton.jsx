@@ -102,10 +102,16 @@ export default function StartButton({ firstClick }) {
           ...report,
           minutesFocused: minutes,
         });
-        updateReport($id, { minutesFocused: minutes });
+        updateReport($id, { minutesFocused: minutes }).then((data) =>
+          dispatchReports({
+            type: "updateReport",
+            report: { minutesFocused: data.minutesFocused },
+          })
+        );
         updateLeaderboardProgress(leaderBoardUserDocumentId, {
           minutesFocused: minutes,
         });
+        report.startedAt && 
         addTimeLine({
           ...report,
           startedAt: new Date(report.startedAt).toISOString(),
@@ -123,7 +129,6 @@ export default function StartButton({ firstClick }) {
         status: "started",
         startedAt: Date.now(),
       });
-      // console.log("timerSettingsDocumentId", timerSettingsDocumentId);
 
       updateTimerSettings(timerSettingsDocumentId, {
         startedAt: new Date().toISOString(),

@@ -2,14 +2,26 @@
 import { useState, useContext, useRef } from "react";
 // import { ReportsContext } from "../../../contexts/context";
 import { ReportsContext } from "../../../contexts/ReportsContextProvider";
-import { deleteTimeline, fetchTimeline } from "../../../appwrite backend/db";
+import {
+  deleteTimeline,
+  fetchTimeline,
+  updateReport,
+  updateLeaderboardProgress,
+} from "../../../appwrite backend/db";
 import { DeleteTimelineToast } from "../../Toast";
+import { getMinutes } from "../../../utils/formatDate";
 
 const LIMIT = 20; // Number of entries per fetch
 
 export default function TimeTracker() {
   const {
-    reportsState: { timeLine, totalDocs }, // totalDocs stored in reducer
+    reportsState: {
+      timeLine,
+      totalDocs,
+      minutesFocused,
+      $id,
+      leaderBoardUserDocumentId,
+    }, // totalDocs stored in reducer
     dispatchReports,
   } = useContext(ReportsContext);
 
@@ -53,9 +65,19 @@ export default function TimeTracker() {
     const updatedEntries = timeLine.filter(
       (item) => (item.$id || item.id) !== (entry.id || entry.$id)
     );
+    const minutes = minutesFocused - getMinutes(entry.startedAt, entry.endedAt);
     DeleteTimelineToast(entry.task);
     dispatchReports({ type: "deleteEntry", timeLine: updatedEntries });
     deleteTimeline(entry.id || entry.$id);
+    updateReport($id, { minutesFocused: minutes }).then((data) =>
+      dispatchReports({
+        type: "updateReport",
+        report: { minutesFocused: data.minutesFocused },
+      })
+    );
+    updateLeaderboardProgress(leaderBoardUserDocumentId, {
+      minutesFocused: minutes,
+    });
   };
 
   return (

@@ -184,11 +184,17 @@ export default function Timer() {
           // timerState.startedAt + timerState.pomodoro * 60 * 1000 works perfectly.
           minutesFocused: minutes,
         });
-        updateReport($id, { minutesFocused: minutes });
+        updateReport($id, { minutesFocused: minutes }).then((data) =>
+          dispatchReports({
+            type: "updateReport",
+            report: { minutesFocused: data.minutesFocused },
+          })
+        );
         updateLeaderboardProgress(leaderBoardUserDocumentId, {
           minutesFocused: minutes,
         });
 
+        report.startedAt &&
         addTimeLine({
           ...report,
           startedAt: new Date(report.startedAt),

@@ -14,7 +14,7 @@ export function reportsReducer(reportsState, action) {
         ...reportsState,
         ...action.report
       }
-    case "updateReports":
+    case "updateReport":
       return {
         ...reportsState,
         ...action.report
