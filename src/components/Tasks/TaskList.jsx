@@ -1,21 +1,14 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from "react";
+import { useState } from "react";
 import TaskMenu from "./TaskMenu";
-// import { TasksContext } from "../../contexts/context";
-import { TasksContext } from "../../contexts/TasksContextProvider";
 import Progress from "../Progress";
 import { FaTrash, FaList, FaCheck } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
-import { deleteTask, updateCurrentTask, updateTask } from "../../appwrite backend/db";
-import {
-  DeleteTaskToast,
-  UpdateTaskToast,
-} from "../Toast";
+import { DeleteTaskToast, UpdateTaskToast } from "../Toast";
+import { useTasksStore } from "../../store/useTasksStore";
 
 export default function TaskList() {
-  const {
-    tasksState: { tasks },
-  } = useContext(TasksContext);
+  const tasks = useTasksStore((state) => state.tasks);
 
   const [options, setOptions] = useState(false);
 
@@ -38,11 +31,10 @@ export default function TaskList() {
       <div className="tasks-heading">
         <div>Tasks</div>
         <button className="btn btn-options" onClick={toggleOptions}>
-          {/* <img src="icons/options.png"></img> */}
           <SlOptionsVertical style={{ color: "white" }} />
         </button>
       </div>
-      <Progress percentage={Math.round(overallTasksProgress)} />
+      <Progress percentage={Math.round(overallTasksProgress)} delay={3} />
       {options && <Menu toggleOptions={toggleOptions} />}
       <TaskMenu />
     </div>
@@ -50,28 +42,23 @@ export default function TaskList() {
 }
 
 function Menu({ toggleOptions }) {
-  const {
-    tasksState: { tasks, currentTask, currentTaskDocumentID },
-    dispatchTasks,
-  } = useContext(TasksContext);
+  const tasks = useTasksStore((state) => state.tasks);
+  const updateTask = useTasksStore((state) => state.updateTask);
+  const deleteTask = useTasksStore((state) => state.deleteTask);
 
   function resetTasksProgress() {
     toggleOptions();
     tasks.forEach((task) => {
-      updateTask(task.$id, { completed: 0 }).then((data) => {
-        dispatchTasks({ type: "reset_task_progress", $id: data.$id });
-        UpdateTaskToast(task.task);
-      });
+      updateTask(task.$id, { completed: 0 });
+      UpdateTaskToast(task.task);
     });
   }
 
   function clearAllTasks() {
     toggleOptions();
     tasks.forEach((task) => {
-      deleteTask(task.$id || task.id).then(() => {
-        dispatchTasks({ type: "deleteTask", id: task.$id || task.id });
-        DeleteTaskToast(task.task);
-      });
+      deleteTask(task.$id || task.id);
+      DeleteTaskToast(task.task);
     });
   }
 
@@ -79,25 +66,7 @@ function Menu({ toggleOptions }) {
     toggleOptions();
     tasks.forEach((task) => {
       if (task.completed >= task.estimated) {
-        if (task.$id === currentTask) {
-          const currentTaskIndex = tasks.findIndex((t) => t.id === currentTask);
-          const nextCurrentTask =
-            tasks.length <= 1
-              ? ""
-              : tasks[currentTaskIndex + 1] ||
-                tasks[currentTask - 1] ||
-                tasks[0];
-          // console.log({ currentTaskDocumentID, currentTaskIndex, nextCurrentTask });
-          updateCurrentTask(
-            currentTaskDocumentID,
-            nextCurrentTask?.id || ""
-          )
-          dispatchTasks({ type: "switchTask", id: nextCurrentTask?.id });
-        }
-        deleteTask(task.$id || task.id).then(() => {
-          dispatchTasks({ type: "deleteTask", id: task.$id || task.id });
-          DeleteTaskToast(task.task);
-        });
+        deleteTask(task.$id || task.id);
       }
     });
   }

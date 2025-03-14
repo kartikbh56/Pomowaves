@@ -1,17 +1,16 @@
-import { useContext, useEffect } from "react";
-// import { TasksContext } from "../contexts/context";
+import { useEffect } from "react";
 import { TasksFinishedToast } from "./Toast";
 import { sendNotification } from "../utils/notification";
-
-import { TimerContext } from "../contexts/TimerContextProvider";
-import { TasksContext } from "../contexts/TasksContextProvider";
+import { useTasksStore } from "../store/useTasksStore";
+import { useTimerStore } from "../store/useTimerStore";
 
 /* eslint-disable react/prop-types */
 export default function Summary() {
-  const { tasksState } = useContext(TasksContext);
-  const { tasks } = tasksState;
-  const { timerState } = useContext(TimerContext);
-  const { pomodoro, longBreak, shortBreak, longBreakInterval } = timerState;
+  const tasks = useTasksStore((state) => state.tasks);
+  const longBreakInterval = useTimerStore((state) => state.longBreakInterval);
+  const pomodoro = useTimerStore((state) => state.pomodoro);
+  const shortBreak = useTimerStore((state) => state.shortBreak);
+  const longBreak = useTimerStore((state) => state.longBreak);
 
   const totalPomodoros = tasks.reduce(
     (acc, cur) => ({
@@ -29,9 +28,9 @@ export default function Summary() {
       totalPomodoros.completed >= totalPomodoros.estimated
     ) {
       TasksFinishedToast();
-      sendNotification("You've finished all your tasks today 🎉");
+      sendNotification("You've finished all your tasks 🎉");
     }
-  }, [totalPomodoros.estimated, totalPomodoros.completed,tasks.length]);
+  }, [totalPomodoros.estimated, totalPomodoros.completed, tasks.length]);
 
   if (remainingTasks === 0 || tasks.length <= 0) {
     return <></>;

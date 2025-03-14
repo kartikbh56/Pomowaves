@@ -33,14 +33,12 @@ export default function MonthWiseStats({
         0
       );
 
-      // console.log({statsOnCurrentDate,totalMinutesOnCurrentDate})
       return {
         day: date,
         minutes: totalMinutesOnCurrentDate,
       };
     }
   );
-  //   console.log(monthStats);
 
   return (
     <>

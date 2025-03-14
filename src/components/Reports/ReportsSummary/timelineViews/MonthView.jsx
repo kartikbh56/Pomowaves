@@ -33,10 +33,8 @@ export default function MonthView() {
   );
 
   const [data, setData] = useState([]);
-  console.log({ firstDayOfTheMonth, lastDayOfTheMonth });
   useEffect(() => {
     const id = setTimeout(() => {
-      // setData([])
       fetchTimelineOnDate(firstDayOfTheMonth, lastDayOfTheMonth).then(
         (data) => {
           setData(data.documents);
@@ -46,7 +44,6 @@ export default function MonthView() {
     return () => clearTimeout(id);
   }, [firstDayOfTheMonth, lastDayOfTheMonth]);
 
-  console.log({ firstDayOfTheMonth, lastDayOfTheMonth });
   return (
     <>
       <MonthSelector

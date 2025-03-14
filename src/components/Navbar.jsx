@@ -1,12 +1,84 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState, useEffect, useRef } from "react";
-import { IsOpenContext } from "../contexts/IsOpenContextProvider";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../appwrite backend/auth";
 import { ImStatsBars } from "react-icons/im";
 import { LuSettings2 } from "react-icons/lu";
 import { FiLogIn } from "react-icons/fi";
-import { UserContext } from "../contexts/UserContextProvider";
+import { useIsOpenStore } from "../store/useIsOpenStore";
+import { logout } from "../appwrite backend/auth";
+
+export default function Navbar({ user, setUser }) {
+  const navigate = useNavigate();
+
+  const toggleMenu = useIsOpenStore((state) => state.toggleMenu);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleToggleMenu = (menu) => {
+    toggleMenu(menu);
+  };
+
+  const handleToggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null)
+    navigate("/auth");
+  };
+
+  // Close dropdown when clicking outside or on the avatar button
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        event.target.closest(".btn") === null
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <header>
+      <Logo />
+      <div className="buttons">
+        <MenuButton
+          icon=<ImStatsBars />
+          label="Reports"
+          onClick={() => handleToggleMenu("reports")}
+        />
+
+        <MenuButton
+          icon=<LuSettings2 />
+          label="Settings"
+          onClick={() => handleToggleMenu("settings")}
+        />
+
+        <button className="btn" onClick={handleToggleDropdown}>
+          <div className="avatar">{user.name.charAt(0)}</div>
+          <span>{user?.name.split(" ")[0]}</span>
+        </button>
+
+        <UserDropdown
+          user={user}
+          isDropdownOpen={isDropdownOpen}
+          onLogout={handleLogout}
+          dropdownRef={dropdownRef} // Pass the ref to the dropdown
+        />
+      </div>
+    </header>
+  );
+}
+
 function Logo() {
   return (
     <div className="logo">
@@ -48,81 +120,5 @@ function UserDropdown({ user, isDropdownOpen, onLogout, dropdownRef }) {
         </div>
       </div>
     )
-  );
-}
-
-export default function Navbar() {
-  const { user, setUser } = useContext(UserContext);
-  const { dispatchIsOpen } = useContext(IsOpenContext);
-  const navigate = useNavigate();
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const handleToggleMenu = (menu) => {
-    dispatchIsOpen({ type: "toggleMenu", menu });
-  };
-
-  const handleToggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/auth");
-      setUser(null);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
-  // Close dropdown when clicking outside or on the avatar button
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        event.target.closest(".btn") === null
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  return (
-    <header>
-      <Logo />
-      <div className="buttons">
-        <MenuButton
-          icon=<ImStatsBars />
-          label="Reports"
-          onClick={() => handleToggleMenu("reports")}
-        />
-
-        <MenuButton
-          icon=<LuSettings2 />
-          label="Settings"
-          onClick={() => handleToggleMenu("settings")}
-        />
-
-        <button className="btn" onClick={handleToggleDropdown}>
-          <div className="avatar">{user.name.charAt(0)}</div>
-          <span>{user.name.split(" ")[0]}</span>
-        </button>
-
-        <UserDropdown
-          user={user}
-          isDropdownOpen={isDropdownOpen}
-          onLogout={handleLogout}
-          dropdownRef={dropdownRef} // Pass the ref to the dropdown
-        />
-      </div>
-    </header>
   );
 }

@@ -33,7 +33,6 @@ export default function WeekWiseStats({ data, firstDayOfTheWeek }) {
     };
   });
 
-  console.log(weekStats);
 
   return (
     <>

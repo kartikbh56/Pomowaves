@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 
-import { useContext } from "react";
-// import { ReportsContext } from "../../../contexts/context";
-import { ReportsContext } from "../../../contexts/ReportsContextProvider";
+import { useReportsStore } from "../../../store/useReportsStore";
+
 
 export default function SummaryCards() {
-  const {
-    reportsState: { minutesFocused, daysAccessed, dayStreak },
-  } = useContext(ReportsContext);
+
+  const minutesFocused = useReportsStore((state)=>state.minutesFocused)
+  const daysAccessed = useReportsStore((state)=>state.daysAccessed)
+  const dayStreak = useReportsStore((state)=>state.dayStreak)
 
   const hoursFocused = minutesFocused > 0 ? Math.round(minutesFocused / 60) : 0;
   const cardsData = [

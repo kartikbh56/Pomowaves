@@ -1,25 +1,24 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useState, useContext, useReducer, useEffect } from "react";
-import { IsOpenContext } from "../../contexts/IsOpenContextProvider";
+import { useState } from "react";
 import SummaryView from "./ReportsSummary/SummaryView";
 import TimeLineDetails from "./DetailReports/Details";
 import LeaderBoard from "./LeaderBoard/LeaderBoard";
 import ReportsContainer from "./ReportsContainer";
+import { useIsOpenStore } from "../../store/useIsOpenStore";
 
 export default function ReportsMenu() {
   const [currentView, setCurrentView] = useState("Summary");
-  const { isOpenState, dispatchIsOpen } = useContext(IsOpenContext);
-  const closeModal = () =>
-    dispatchIsOpen({ type: "toggleMenu", menu: "reports" });
-  if (!isOpenState.reports) return <></>;
+  const toggleMenu = useIsOpenStore((state) => state.toggleMenu);
+  const closeReports = () => toggleMenu("reports");
+  
   return (
-    <ReportsContainer>
+    <ReportsContainer closeReports={closeReports}>
       <img
         className="close-button"
         style={{ padding: "0px" }}
         src="icons/close.png"
-        onClick={closeModal}
+        onClick={closeReports}
       />
       <ReportsTabs setCurrentView={setCurrentView} currentView={currentView} />
       {currentView === "Summary" && <SummaryView />}

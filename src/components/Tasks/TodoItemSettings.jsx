@@ -1,51 +1,30 @@
 /* eslint-disable react/prop-types */
-import { useState, useContext } from "react";
-// import { TasksContext } from "../../contexts/context";
-import { deleteTask, updateCurrentTask, updateTask } from "../../appwrite backend/db";
-import { TasksContext } from "../../contexts/TasksContextProvider";
+import { useState } from "react";
 import { DeleteTaskToast, UpdateTaskToast } from "../Toast";
+import { useTasksStore } from "../../store/useTasksStore";
 export default function TodoItemSettings({ toggleOptions, todo }) {
   const [options, setOptions] = useState({
     taskTitle: todo.task,
     estimated: todo.estimated,
   });
   const { taskTitle, estimated } = options;
-  const {
-    dispatchTasks,
-    tasksState: { tasks, currentTask, currentTaskDocumentID },
-  } = useContext(TasksContext);
+  const updateTask = useTasksStore((state) => state.updateTask);
+  const deleteTask = useTasksStore((state) => state.deleteTask);
+
   function saveSettings() {
     if (options.taskTitle) {
-      dispatchTasks({
-        type: "modifyTask",
-        id: todo.id,
-        title: options.taskTitle,
-        estimated: options.estimated,
-      });
-      updateTask(todo.$id, {
+      updateTask(todo.id, {
         task: options.taskTitle,
         estimated: options.estimated,
-      }).then((data) => UpdateTaskToast(data.task));
+      });
+      UpdateTaskToast(todo.task);
       toggleOptions();
     }
   }
 
   function deleteCurrentTask() {
-    deleteTask(todo.id || todo.$id).then(() => {
-      dispatchTasks({ type: "deleteTask", id: todo.id || todo.$id });
-      DeleteTaskToast(todo.task);
-    }); // delete the task from task list
-    if (todo.id === currentTask) {
-      // if the task to be deleted is currentTask
-      const currentTaskIndex = tasks.findIndex((t) => t.id === todo.id);
-      const nextCurrentTask =
-        tasks.length <= 1
-          ? ""
-          : tasks[currentTaskIndex + 1] || tasks[currentTask - 1] || tasks[0];
-      // console.log({ currentTaskDocumentID, currentTaskIndex, nextCurrentTask });
-      updateCurrentTask(currentTaskDocumentID, nextCurrentTask?.id || "")
-      dispatchTasks({ type: "switchTask", id: nextCurrentTask?.id });
-    }
+    deleteTask(todo.id || todo.$id);
+    DeleteTaskToast(todo.task);
   }
   return (
     <div className="modalview" onClick={toggleOptions}>

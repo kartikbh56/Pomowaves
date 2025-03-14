@@ -1,16 +1,10 @@
-import { useContext } from "react";
-// import { TasksContext } from "../../contexts/context";
 import TodoItem from "./TodoItem";
-import { updateCurrentTask } from "../../appwrite backend/db";
-import { TasksContext } from "../../contexts/TasksContextProvider";
+import { useTasksStore } from "../../store/useTasksStore";
 export default function TaskMenu() {
-  const {
-    tasksState: { tasks, currentTaskDocumentID },
-    dispatchTasks,
-  } = useContext(TasksContext);
+  const tasks = useTasksStore((state) => state.tasks);
+  const updateCurrentTask = useTasksStore((state) => state.updateCurrentTask);
   function switchTask(id) {
-    dispatchTasks({ type: "switchTask", id: id });
-    updateCurrentTask(currentTaskDocumentID, id);
+    updateCurrentTask(id);
   }
   return (
     <div className="todo-container">

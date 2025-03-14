@@ -1,13 +1,9 @@
 /* eslint-disable react/prop-types */
-import { useContext } from "react";
-// import { TasksContext } from "../../contexts/context";
-import { TasksContext } from "../../contexts/TasksContextProvider";
 import { SlOptionsVertical } from "react-icons/sl";
+import { useTasksStore } from "../../store/useTasksStore";
 
 export default function Todo({ todo, handleClick, toggleOptions }) {
-  const {
-    tasksState: { currentTask },
-  } = useContext(TasksContext);
+  const currentTask = useTasksStore((state) => state.currentTask);
   const { task, completed, estimated, id } = todo;
   const selectedState = currentTask === id;
   const taskProgress = (completed * 100) / estimated;
@@ -50,7 +46,6 @@ export default function Todo({ todo, handleClick, toggleOptions }) {
           <SlOptionsVertical
             size={12}
             style={{ color: "rgba(0, 0, 0, 0.65)" }}
-
           />
         </div>
       </div>

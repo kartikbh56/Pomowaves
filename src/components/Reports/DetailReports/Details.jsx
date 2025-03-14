@@ -1,54 +1,20 @@
 /* eslint-disable react/prop-types */
-import { useState, useContext, useRef } from "react";
-// import { ReportsContext } from "../../../contexts/context";
-import { ReportsContext } from "../../../contexts/ReportsContextProvider";
-import {
-  deleteTimeline,
-  fetchTimeline,
-  updateReport,
-  updateLeaderboardProgress,
-} from "../../../appwrite backend/db";
-import { DeleteTimelineToast } from "../../Toast";
-import { getMinutes } from "../../../utils/formatDate";
-
-const LIMIT = 20; // Number of entries per fetch
+import { useState, useRef } from "react";
+import { useReportsStore } from "../../../store/useReportsStore";
 
 export default function TimeTracker() {
-  const {
-    reportsState: {
-      timeLine,
-      totalDocs,
-      minutesFocused,
-      $id,
-      leaderBoardUserDocumentId,
-    }, // totalDocs stored in reducer
-    dispatchReports,
-  } = useContext(ReportsContext);
+  const timeLine = useReportsStore((state) => state.timeLine);
+  const fetchMoreTimelineEntries = useReportsStore(
+    (state) => state.fetchMoreTimelineEntries
+  );
+  const deleteTimeline = useReportsStore((state) => state.deleteTimeline);
 
-  const lastDoc = timeLine[timeLine.length - 1];
   const [loading, setLoading] = useState(false);
-  const [lastId, setLastId] = useState(lastDoc?.$id || lastDoc?.id); // Store last document ID for pagination
   const tableBodyRef = useRef(null);
 
   const fetchMoreData = () => {
-    if (loading || timeLine.length >= totalDocs) return; // Stop fetching if all data is loaded
     setLoading(true);
-
-    fetchTimeline(LIMIT, lastId).then((response) => {
-      if (response.documents.length > 0) {
-        dispatchReports({
-          type: "fetchMoreEntries",
-          timeLine: response.documents.map((r) => ({
-            ...r,
-            startedAt: new Date(r.startedAt),
-            endedAt: new Date(r.endedAt),
-          })),
-          totalDocs: response.total,
-        });
-        setLastId(response.documents[response.documents.length - 1].$id);
-      }
-      setLoading(false);
-    });
+    fetchMoreTimelineEntries().then(() => setLoading(false));
   };
 
   const handleScroll = () => {
@@ -62,22 +28,7 @@ export default function TimeTracker() {
   };
 
   const handleDelete = (entry) => {
-    const updatedEntries = timeLine.filter(
-      (item) => (item.$id || item.id) !== (entry.id || entry.$id)
-    );
-    const minutes = minutesFocused - getMinutes(entry.startedAt, entry.endedAt);
-    DeleteTimelineToast(entry.task);
-    dispatchReports({ type: "deleteEntry", timeLine: updatedEntries });
-    deleteTimeline(entry.id || entry.$id);
-    updateReport($id, { minutesFocused: minutes }).then((data) =>
-      dispatchReports({
-        type: "updateReport",
-        report: { minutesFocused: data.minutesFocused },
-      })
-    );
-    updateLeaderboardProgress(leaderBoardUserDocumentId, {
-      minutesFocused: minutes,
-    });
+    deleteTimeline(entry);
   };
 
   return (

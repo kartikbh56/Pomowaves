@@ -1,102 +1,36 @@
 /* eslint-disable react/prop-types */
-import {
-  addTimeLine,
-  updateTimerSettings,
-  updateReport,
-  updateLeaderboardProgress,
-} from "../../appwrite backend/db";
 
-import { ReportsContext } from "../../contexts/ReportsContextProvider";
-
-import { TimerContext } from "../../contexts/TimerContextProvider";
-import { TasksContext } from "../../contexts/TasksContextProvider";
-import { CountdownContext } from "../../contexts/CountdownContext";
-import { formatMinutes, getMinutes } from "../../utils/formatDate";
 import { getColor } from "../../utils/getColor";
-import { useEffect, useContext } from "react";
-import { AddTimelineToast } from "../Toast";
+import { useEffect } from "react";
+import { useTimerStore } from "../../store/useTimerStore";
+import { useTasksStore } from "../../store/useTasksStore";
+import { useReportsStore } from "../../store/useReportsStore";
 
 export default function TimerNavigation({ firstClick }) {
-  const { timerState, dispatchTimerState } = useContext(TimerContext);
-  const { tasksState } = useContext(TasksContext);
-  const {
-    reportsState: { $id, minutesFocused, leaderBoardUserDocumentId },
-    dispatchReports,
-  } = useContext(ReportsContext);
-  const { $id: timerSettingsDocumentId } = timerState;
-  const { mode } = timerState;
-  const { dispatchCountdown } = useContext(CountdownContext);
+  const mode = useTimerStore((state) => state.mode);
+  const changeMode = useTimerStore((state) => state.changeMode);
+  const currentTaskId = useTasksStore((state) => state.currentTask);
+  const tasks = useTasksStore((state) => state.tasks);
+  const status = useTimerStore((state) => state.status);
+  const startedAt = useTimerStore((state) => state.startedAt);
+  const addTimeLine = useReportsStore((state) => state.addTimeLine);
+
   const selected = {
     fontWeight: "bold",
     backgroundColor: "rgba(0, 0, 0, 0.15)",
   };
   function handleClick(btn) {
-    dispatchTimerState({
-      type: "changeMode",
-      mode: btn,
-      status: "initial",
-      secsCompletedAtPause: 0,
-      startedAt: null,
-    });
-    //db
-    updateTimerSettings(timerSettingsDocumentId, {
-      mode: btn,
-      status: "initial",
-      secsCompletedAtPause: 0,
-      startedAt: null,
-    });
+    changeMode(btn);
 
-    dispatchCountdown({
-      type: "setCountdown",
-      secondsRemaining: timerState[btn] * 60,
-    });
-
-    const currentTask = tasksState.tasks?.find(
-      (t) => t.id === tasksState.currentTask
-    );
+    const currentTask = tasks?.find((t) => t.id === currentTaskId);
     const currentTaskName = currentTask?.task;
 
     if (
-      timerState.mode === "pomodoro" &&
-      timerState.status != "initial" &&
-      Math.floor((Date.now() - timerState.startedAt) / (1000 * 60)) > 0
+      mode === "pomodoro" &&
+      status === "started" &&
+      Math.floor((Date.now() - startedAt) / (1000 * 60)) > 0
     ) {
-      // If you reset the timer (), add a report only if the focus time is more than 0
-      const report = {
-        id: crypto.randomUUID(),
-        task: currentTaskName || "No task",
-        startedAt: timerState.startedAt,
-        endedAt: Date.now(),
-      };
-      const minutes =
-        Math.round((report.endedAt - report.startedAt) / (1000 * 60)) +
-        minutesFocused;
-      dispatchReports({
-        type: "addReport",
-        ...report,
-        minuteFocused: minutes,
-      });
-      updateReport($id, { minutesFocused: minutes }).then((data) =>
-        dispatchReports({
-          type: "updateReport",
-          report: { minutesFocused: data.minutesFocused },
-        })
-      );
-      updateLeaderboardProgress(leaderBoardUserDocumentId, {
-        minutesFocused: minutes,
-      });
-
-      report.startedAt && 
-      addTimeLine({
-        ...report,
-        startedAt: new Date(report.startedAt).toISOString(),
-        endedAt: new Date(report.endedAt).toISOString(),
-      }).then(() =>
-        AddTimelineToast(
-          report.task,
-          formatMinutes(getMinutes(report.startedAt, report.endedAt))
-        )
-      );
+      addTimeLine(currentTaskName, startedAt, new Date());
     }
     firstClick.current = false;
   }

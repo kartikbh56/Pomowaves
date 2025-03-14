@@ -1,16 +1,12 @@
-import { useContext, useEffect } from "react";
-// import { TasksContext } from "../../contexts/context";
-import { TimerContext } from "../../contexts/TimerContextProvider";
+import { useEffect } from "react";
 import { CurrentTaskToast } from "../Toast";
-import { TasksContext } from "../../contexts/TasksContextProvider";
+import { useTasksStore } from "../../store/useTasksStore";
+import { useTimerStore } from "../../store/useTimerStore";
 export default function CurrentTask() {
-  const {
-    tasksState: { tasks, currentTask },
-  } = useContext(TasksContext);
-  const {
-    timerState: { completedPomodoros, mode },
-  } = useContext(TimerContext);
-
+  const mode = useTimerStore((state) => state.mode);
+  const completedPomodoros = useTimerStore((state) => state.completedPomodoros);
+  const tasks = useTasksStore((state) => state.tasks);
+  const currentTask = useTasksStore((state) => state.currentTask);
   const currentTaskName = tasks.find((e) => e.id === currentTask)?.task;
 
   useEffect(

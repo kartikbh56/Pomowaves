@@ -43,7 +43,6 @@ export default function TaskWiseStats({ data }) {
     0
   );
 
-  console.log(taskWiseData);
   return (
     <>
       <TaskWiseChart taskWiseData={taskWiseData} />

@@ -1,49 +1,31 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef } from "react";
-
-import { ReportsContext } from "../../contexts/ReportsContextProvider";
-
-import { TasksContext } from "../../contexts/TasksContextProvider";
-
-import { TimerContext } from "../../contexts/TimerContextProvider";
-
-import { CountdownContext } from "../../contexts/CountdownContext";
-import {
-  addTimeLine,
-  updateLeaderboardProgress,
-  updateReport,
-  updateTask,
-  updateTimerSettings,
-} from "../../appwrite backend/db";
+import { useEffect, useRef } from "react";
 import { getColor } from "../../utils/getColor";
-import { AddTimelineToast, UpdateTaskToast } from "../Toast";
-import { formatMinutes, getMinutes } from "../../utils/formatDate";
+import { useTimerStore } from "../../store/useTimerStore";
+import { useTasksStore } from "../../store/useTasksStore";
+import { useReportsStore } from "../../store/useReportsStore";
 
 export default function StartButton({ firstClick }) {
-  const {
-    timerState,
-    timerState: {
-      status,
-      mode,
-      autoStartBreaks,
-      autoStartPomodoros,
-      startedAt,
-    },
-    dispatchTimerState,
-  } = useContext(TimerContext);
-  const timerSettingsDocumentId = timerState.$id;
-  const { tasksState, dispatchTasks } = useContext(TasksContext);
-
-  const {
-    reportsState: { $id, minutesFocused, leaderBoardUserDocumentId },
-    dispatchReports,
-  } = useContext(ReportsContext);
-
-  const {
-    countdownState: { secondsRemaining },
-  } = useContext(CountdownContext);
-
   const buttonRef = useRef(null);
+  
+  // timer
+  const mode = useTimerStore((state) => state.mode);
+  const autoStartBreaks = useTimerStore((state) => state.autoStartBreaks);
+  const autoStartPomodoros = useTimerStore((state) => state.autoStartPomodoros);
+  const status = useTimerStore((state) => state.status);
+  const pauseTimer = useTimerStore((state) => state.pauseTimer);
+  const startedAt = useTimerStore((state) => state.startedAt);
+  const startTimer = useTimerStore((state) => state.startTimer);
+  
+  // tasks
+  const tasks = useTasksStore((state) => state.tasks);
+  const currentTask = useTasksStore((state) => state.currentTask);
+  const sortTasks = useTasksStore((state) => state.sortTasks);
+  
+  // reports
+  const addTimeLine = useReportsStore((state) => state.addTimeLine);
+  const updateTask = useTasksStore((state) => state.updateTask);
+
   useEffect(() => {
     if (firstClick.current) {
       if (
@@ -54,7 +36,7 @@ export default function StartButton({ firstClick }) {
       ) {
         const timer = setTimeout(() => {
           buttonRef.current.click();
-        }, 1000);
+        }, 500);
         return () => {
           clearTimeout(timer);
         };
@@ -68,100 +50,31 @@ export default function StartButton({ firstClick }) {
 
     if (status === "started") {
       // when paused
-      const secsCompletedAtPause = timerState[mode] * 60 - secondsRemaining;
-      dispatchTimerState({
-        type: "paused",
-        status: "paused",
-        startedAt: null,
-        secsCompletedAtPause: secsCompletedAtPause,
-      });
-      //db
-      updateTimerSettings(timerSettingsDocumentId, {
-        status: "paused",
-        startedAt: null,
-        secsCompletedAtPause: secsCompletedAtPause,
-      });
+      pauseTimer();
 
-      const currentTaskName = tasksState.tasks.find(
-        (e) => e.id === tasksState.currentTask
-      )?.task;
+      const currentTaskName = tasks.find((e) => e.id === currentTask)?.task;
 
       if (Math.floor((Date.now() - startedAt) / (1000 * 60)) > 0) {
         // If you pause the timer, add a report only if the focus time is more than 0 minutes
-        const report = {
-          id: crypto.randomUUID(),
-          task: currentTaskName || "No Task",
-          startedAt: startedAt,
-          endedAt: Date.now(),
-        };
-        const minutes =
-          Math.round((report.endedAt - report.startedAt) / (1000 * 60)) +
-          minutesFocused;
-        dispatchReports({
-          type: "addReport",
-          ...report,
-          minutesFocused: minutes,
-        });
-        updateReport($id, { minutesFocused: minutes }).then((data) =>
-          dispatchReports({
-            type: "updateReport",
-            report: { minutesFocused: data.minutesFocused },
-          })
-        );
-        updateLeaderboardProgress(leaderBoardUserDocumentId, {
-          minutesFocused: minutes,
-        });
-        report.startedAt && 
-        addTimeLine({
-          ...report,
-          startedAt: new Date(report.startedAt).toISOString(),
-          endedAt: new Date(report.endedAt).toISOString(),
-        }).then(() =>
-          AddTimelineToast(
-            report.task,
-            formatMinutes(getMinutes(report.startedAt, report.endedAt))
-          )
-        );
+        addTimeLine(currentTaskName, startedAt, Date.now());
       }
     } else {
-      dispatchTimerState({
-        type: "started",
-        status: "started",
-        startedAt: Date.now(),
-      });
-
-      updateTimerSettings(timerSettingsDocumentId, {
-        startedAt: new Date().toISOString(),
-        status: "started",
-      });
+      startTimer();
     }
 
-    if (status === "initial" && mode === "pomodoro" && tasksState.currentTask)
-      dispatchTasks({ type: "sortTasks" });
+    if (status === "initial" && mode === "pomodoro" && currentTask) {
+      sortTasks();
 
-    const currentTask = tasksState.currentTask
-      ? tasksState.tasks.find((t) => t.id === tasksState.currentTask)
-      : tasksState.tasks[0];
+      const currentTaskObj = currentTask
+        ? tasks.find((t) => t.id === currentTask)
+        : tasks[0];
 
-    if (
-      currentTask?.completed >= currentTask?.estimated &&
-      mode === "pomodoro"
-    ) {
-      const newTasks = tasksState.tasks.map((task) =>
-        task.id === currentTask.id
-          ? { ...task, estimated: task.estimated + 1 }
-          : task
-      );
-      dispatchTasks({
-        type: "setTasks",
-        tasks: newTasks,
-        currentTask: currentTask.id,
-      });
-      updateTask(currentTask.id, { estimated: currentTask.estimated + 1 }).then(
-        (data) => UpdateTaskToast(data.task)
-      );
-
-      dispatchTasks({ type: "sortTasks" });
+      if (
+        currentTaskObj?.completed >= currentTaskObj?.estimated &&
+        mode === "pomodoro"
+      ) {
+        updateTask(currentTask, { estimated: currentTaskObj.estimated + 1 });
+      }
     }
   }
   const btnColor = getColor(mode);

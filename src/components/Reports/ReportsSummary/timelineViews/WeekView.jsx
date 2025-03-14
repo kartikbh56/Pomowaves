@@ -34,7 +34,6 @@ export default function WeekView() {
     [firstDayOfTheWeek]
   );
 
-  // console.log({ firstDayOfTheWeek, lastDayOfTheWeek });
 
   const [data, setData] = useState([]);
   useEffect(() => {

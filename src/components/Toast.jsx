@@ -27,6 +27,7 @@ export function AddTaskToast(task) {
     }
   );
 }
+
 export function UpdateTaskToast(task) {
   toast.success(
     <span>
@@ -107,7 +108,7 @@ export function AddTimelineToast(timeline, minutes) {
 export function TasksFinishedToast() {
   toast.success(
     <span>
-      You have finised all your tasks today 🎉
+      You have finised all your tasks🎉
     </span>,
     {
       position: "bottom-center",

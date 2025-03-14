@@ -4,7 +4,7 @@ import DayView from "./timelineViews/DayView";
 import MonthView from "./timelineViews/MonthView";
 
 export default function FocusHours() {
-  const [view, setView] = useState("Day");
+  const [view, setView] = useState("Week"); // "Day" "Week" "Month"
 
   const viewControls = ["Day", "Week", "Month"].map((period) => (
     <button

@@ -8,7 +8,6 @@ async function initializeUser() {
   try {
     const { $id } = await getCurrentUser();
     userId = $id;
-    console.log(userId);
   } catch (error) {
     console.error("Failed to fetch user:", error);
   }
@@ -34,8 +33,6 @@ export async function fetchTasks() {
     databaseId, // databaseId
     tasksCollectionId // collectionIdj
   );
-  console.log("Fetched tasks");
-  console.log(result.documents);
   return result.documents;
 }
 
@@ -51,7 +48,6 @@ export async function addTask(task, taskId) {
       Permission.delete(Role.user(userId)), // Only this user can delete
     ]
   );
-  console.log(result);
   return result;
 }
 
@@ -62,17 +58,15 @@ export async function updateTask(documentId, modification) {
     documentId, // documentId
     modification
   );
-  console.log("Task updated", result);
   return result;
 }
 
 export async function deleteTask(documentId) {
-  const result = await databases.deleteDocument(
+  await databases.deleteDocument(
     databaseId, // databaseId
     tasksCollectionId, // collectionId
     documentId // documentId
   );
-  console.log("Task deleted", result);
 }
 
 /*********************************************************************************/
@@ -84,7 +78,6 @@ export async function fetchCurrentTask() {
     databaseId,
     currentTaskCollectionId
   );
-  console.log("Fetched currentTask ", result?.documents);
   return result?.documents[0];
 }
 
@@ -100,7 +93,7 @@ export async function addCurrentTask(currentTaskId) {
       Permission.delete(Role.user(userId)), // Only this user can delete
     ]
   );
-  console.log("Added currentTask");
+  console.log("created currentTask", result)
   return result;
 }
 
@@ -111,7 +104,7 @@ export async function updateCurrentTask(currentTaskDocumentID, newTaskId) {
     currentTaskDocumentID,
     { currentTaskId: newTaskId }
   );
-  console.log("updated currentTask", result);
+  return result;
 }
 
 /*********************************************************************************/
@@ -122,8 +115,6 @@ export async function fetchTimerSettings() {
     databaseId, // databaseId
     timerSettingsCollectionId // collectionId
   );
-  console.log("Fetched timer settings");
-  console.log("timerSettings", result);
   return result?.documents[0];
 }
 
@@ -139,7 +130,7 @@ export async function createTimerSettings(timerSettings) {
       Permission.delete(Role.user(userId)), // Only this user can delete
     ]
   );
-  console.log("Added Timer Settings", result);
+  console.log("created timerSettings", result)
   return result;
 }
 
@@ -153,7 +144,7 @@ export async function updateTimerSettings(
     timerSettingsDocumentId,
     modification
   );
-  console.log("updated timer settings", result);
+  return result
 }
 
 /*********************************************************************************/
@@ -163,7 +154,6 @@ export async function initialFetchTimeline(limit) {
     Query.limit(limit),
     Query.orderDesc("startedAt"),
   ]);
-  console.log("timeline", docs);
   return docs;
 }
 
@@ -173,19 +163,17 @@ export async function fetchTimeline(limit, lastId) {
     Query.cursorAfter(lastId),
     Query.orderDesc("startedAt"),
   ]);
-  console.log("timeline", docs);
   return docs;
 }
 
 export async function fetchTimelineOnDate(fromDate, toDate) {
   const docs = await databases.listDocuments(databaseId, timeLineCollectionId, [
     Query.and([
-      Query.lessThan("$createdAt", toDate),
-      Query.greaterThan("$createdAt", fromDate),
+      Query.lessThan("endedAt", toDate),
+      Query.greaterThan("startedAt", fromDate),
     ]),
     Query.limit(5000),
   ]);
-  console.log("timeline from ", fromDate, toDate, docs);
   return docs;
 }
 
@@ -215,14 +203,13 @@ export async function deleteTimeline(documentId) {
     timeLineCollectionId, // collectionId
     documentId // documentId
   );
-  console.log("Task deleted", result);
+  return result
 }
 
 /******************************************************************/
 // REPORTS
 export async function fetchReports() {
   const result = await databases.listDocuments(databaseId, reportsCollectionId);
-  console.log("Fetched reports", result);
   return result?.documents[0];
 }
 
@@ -238,7 +225,7 @@ export async function createReport(reports) {
       Permission.delete(Role.user(userId)), // Only this user can delete
     ]
   );
-  console.log("Added initial reports", result);
+  console.log("created reports",result)
   return result;
 }
 
@@ -249,7 +236,6 @@ export async function updateReport(reportsDocumentId, modification) {
     reportsDocumentId,
     modification
   );
-  // console.log("updated reports settings", result);
   return result;
 }
 
@@ -262,7 +248,6 @@ export async function fetchleaderboardEntries() {
     leaderboardCollectionId,
     [Query.orderDesc("minutesFocused")]
   );
-  console.log("leaderboard", docs);
   return docs?.documents;
 }
 
@@ -282,7 +267,6 @@ export async function addUserToLeaderboard(userId, name) {
     ID.unique(), // documentId
     { userId: userId, name: name, minutesFocused: 0 } // data
   );
-  console.log(result);
   return result;
 }
 
@@ -293,5 +277,5 @@ export async function updateLeaderboardProgress(documentId, modification) {
     documentId, // documentId
     modification
   );
-  console.log(result);
+  return result
 }
