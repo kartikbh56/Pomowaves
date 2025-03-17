@@ -36,7 +36,7 @@ export const useReportsStore = create(
         if (!data) {
           // if there is no reports document for the user (new user), create one.
           const reports = await createReport({
-            minuteFocused: initialReports.minuteFocused,
+            minutesFocused: initialReports.minutesFocused,
             daysAccessed: initialReports.daysAccessed,
             dayStreak: initialReports.dayStreak,
             lastAccessed: new Date().toISOString(),
@@ -49,6 +49,8 @@ export const useReportsStore = create(
           // if already exists
           const today = new Date();
           const lastAccessed = new Date(data.lastAccessed || new Date());
+          const minutesFocused = data.minutesFocused;
+          set(() => ({ minutesFocused: minutesFocused }));
 
           let streak = data.dayStreak;
           let daysAccessed = data.daysAccessed;

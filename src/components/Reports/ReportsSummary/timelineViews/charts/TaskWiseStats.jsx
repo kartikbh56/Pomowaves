@@ -61,13 +61,13 @@ function TaskWiseChart({ taskWiseData }) {
         <Tooltip
           cursor={{ fill: "rgba(107, 107, 107, 0.1)" }}
           contentStyle={{
-            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            backgroundColor: "rgba(0, 0, 0, 0.81)",
             borderRadius: "8px",
             border: "none",
             boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
           }}
           labelStyle={{ color: "#fff" }}
-          formatter={(value) => [formatMinutes(value), "Duration"]}
+          formatter={(value) => [formatMinutes(value), "Total"]}
         />
         <Legend iconType="line" verticalAlign="top" />
         <Bar
