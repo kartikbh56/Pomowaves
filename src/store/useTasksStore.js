@@ -37,7 +37,7 @@ export const useTasksStore = create(
 
         if (
           !currentTaskId ||
-          fetchedTasks.find((t) => t.id !== currentTaskId)
+          !fetchedTasks.find((t) => t.id === currentTaskId)
         ) {
           // if there's no currentTaskId or if the currentTaskId does not match with any of the tasks id in tasklist,
           // set the first task's id as the the currentTaskId

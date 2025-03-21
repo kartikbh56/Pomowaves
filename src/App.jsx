@@ -41,7 +41,7 @@ export default function App() {
         if (currentUser) {
           setUser(currentUser);
           initLeaderBoard(currentUser.$id, currentUser.name);
-          initData();
+          await initData();
         }
       } catch (error) {
         console.error("Authentication error:", error);
