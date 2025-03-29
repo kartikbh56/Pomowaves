@@ -11,7 +11,7 @@ export function StreakToast(streak) {
       🔥<strong style={{ color: "rgb(216, 86, 86)" }}>{streak}</strong> days
       streak!
     </span>,
-    { style: toastBackgroundStyle }
+    { style: toastBackgroundStyle, duration: 5000 }
   );
 }
 
