@@ -76,7 +76,7 @@ export const useTimerStore = create(
           startedAt: new Date(),
         };
 
-        set(() => startedState);
+        set(startedState);
 
         //db
         updateTimerSettings(state.$id, {
@@ -86,9 +86,9 @@ export const useTimerStore = create(
       },
 
       setCountdown: (secondsRemaining) => {
-        set(() => ({
+        set({
           secondsRemaining: secondsRemaining,
-        }));
+        });
       },
 
       pauseTimer: () => {
@@ -100,7 +100,7 @@ export const useTimerStore = create(
           startedAt: null,
           secsCompletedAtPause: secsCompletedAtPause,
         };
-        set(() => pausedState);
+        set(pausedState);
 
         //db
         updateTimerSettings(state.$id, pausedState);
@@ -121,10 +121,10 @@ export const useTimerStore = create(
           startedAt: null,
           secsCompletedAtPause: 0,
         };
-        set(() => ({
+        set({
           ...finishedPomodoroState,
           secondsRemaining: secondsRemaining,
-        }));
+        });
 
         //db
         updateTimerSettings(state.$id, finishedPomodoroState);
@@ -163,10 +163,10 @@ export const useTimerStore = create(
           secondsRemaining -= state.secsCompletedAtPause;
         }
 
-        set(() => ({
+        set({
           ...timerSettings,
           secondsRemaining: secondsRemaining,
-        }));
+        });
 
         updateTimerSettings(state.$id, {
           ...timerSettings,
@@ -181,10 +181,10 @@ export const useTimerStore = create(
           secsCompletedAtPause: 0,
           startedAt: null,
         };
-        set(() => ({
+        set({
           ...changeModeState,
           secondsRemaining: state[btn] * 60,
-        }));
+        });
         //db
         updateTimerSettings(state.$id, changeModeState);
       },

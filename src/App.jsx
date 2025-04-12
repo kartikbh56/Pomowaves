@@ -40,8 +40,11 @@ export default function App() {
         const currentUser = await getCurrentUser();
         if (currentUser) {
           setUser(currentUser);
-          initLeaderBoard(currentUser.$id, currentUser.name);
-          await initData();
+          initLeaderBoard(currentUser);
+          await initTimerSettings();
+          initTasks();
+          initReports();
+          initTimeline();
         }
       } catch (error) {
         console.error("Authentication error:", error);
@@ -51,13 +54,6 @@ export default function App() {
     }
     fetchUser();
   }, []);
-
-  async function initData() {
-    await initReports();
-    await initTasks();
-    await initTimerSettings();
-    initTimeline();
-  }
 
   if (loading) {
     return <Loader />;

@@ -45,11 +45,11 @@ export const useTasksStore = create(
           currentTaskId && updateCurrentTask($id, currentTaskId);
         }
 
-        set(() => ({
+        set({
           tasks: sortedTasks,
           currentTask: currentTaskId,
           currentTaskDocumentID: $id,
-        }));
+        });
         return;
       },
 
@@ -65,10 +65,10 @@ export const useTasksStore = create(
 
         tasks = [...tasks, newTask];
 
-        set(() => ({
+        set({
           tasks: tasks,
           currentTask: currentTask,
-        }));
+        });
       },
 
       deleteTask: (id) => {
@@ -84,10 +84,10 @@ export const useTasksStore = create(
           currentTask = nextCurrentTask?.id || "";
         }
 
-        set(() => ({
+        set({
           tasks: newTasks,
           currentTask: currentTask,
-        }));
+        });
 
         //db
         deleteTask(id);
@@ -106,7 +106,7 @@ export const useTasksStore = create(
 
       updateCurrentTask: async (taskId) => {
         const { currentTaskDocumentID } = get();
-        set(() => ({ currentTask: taskId }));
+        set({ currentTask: taskId });
         //db
         updateCurrentTask(currentTaskDocumentID, taskId);
       },

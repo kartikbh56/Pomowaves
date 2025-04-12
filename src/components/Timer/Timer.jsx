@@ -9,6 +9,7 @@ import StartButton from "./StartButton";
 import { useTimerStore } from "../../store/useTimerStore";
 import { useTasksStore } from "../../store/useTasksStore";
 import { useReportsStore } from "../../store/useReportsStore";
+import { fetchCurrentTask, fetchTasks } from "../../appwrite backend/db";
 
 export default function Timer() {
   const timerIdRef = useRef(null);
@@ -28,12 +29,12 @@ export default function Timer() {
   const currentTimer = useTimerStore((state) => state[state.mode]); // current mode timer (pomodoro, shortBreak, longBreak)
 
   // tasks store
+  let tasks = useTasksStore((state) => state.tasks);
+  let currentTaskId = useTasksStore((state) => state.currentTask);
+  let currentTask = tasks.find((t) => t.id === currentTaskId);
+  let currentTaskName = currentTask?.task;
   const updateCurrentTask = useTasksStore((state) => state.updateCurrentTask);
-  const currentTaskId = useTasksStore((state) => state.currentTask);
-  const tasks = useTasksStore((state) => state.tasks);
   const updateTask = useTasksStore((state) => state.updateTask);
-  const currentTask = tasks.find((t) => t.id === currentTaskId);
-  const currentTaskName = currentTask?.task;
 
   // reports store
   const addTimeLine = useReportsStore((state) => state.addTimeLine);
@@ -59,36 +60,48 @@ export default function Timer() {
     };
   }, [status, currentTimer]);
 
-  useEffect(() => {
-    if (secondsRemaining <= 0) {
-      // when a timer gets finished
-      clearInterval(timerIdRef.current);
-      timerIdRef.current = null;
-      if (mode === "pomodoro") {
-        // when a pomodoro timer gets finished
-        finishPomodoro();
-        updateTask(currentTaskId, { completed: currentTask?.completed + 1 });
-        addTimeLine(
-          currentTaskName,
-          startedAt,
-          new Date(
-            startedAt.getTime() +
-              pomodoro * 60 * 1000 -
-              secsCompletedAtPause * 1000
-          )
-        );
-      } else {
-        finishBreak();
-        if (currentTask.completed + 1 >= currentTask.estimated) {
-          const nextTaskId = tasks.find(
-            (t) => t.id !== currentTask && t.completed < t.estimated
-          )?.id;
-          nextTaskId && updateCurrentTask(nextTaskId);
+  useEffect(
+    () =>
+      async function () {
+        if (secondsRemaining <= 0) {
+          // when a timer gets finished
+          clearInterval(timerIdRef.current);
+          timerIdRef.current = null;
+          if (mode === "pomodoro") {
+            // when a pomodoro timer gets finished
+            finishPomodoro();
+            if (!currentTaskId && !currentTask) {
+              tasks = await fetchTasks();
+              currentTaskId = (await fetchCurrentTask()).currentTaskId;
+              currentTask = tasks.find((t) => t.id === currentTaskId);
+              currentTaskName = currentTask?.task;
+            }
+            updateTask(currentTaskId, {
+              completed: currentTask?.completed + 1,
+            });
+            addTimeLine(
+              currentTaskName,
+              startedAt,
+              new Date(
+                startedAt.getTime() +
+                  pomodoro * 60 * 1000 -
+                  secsCompletedAtPause * 1000
+              )
+            );
+          } else {
+            finishBreak();
+            if (currentTask.completed + 1 >= currentTask.estimated) {
+              const nextTaskId = tasks.find(
+                (t) => t.id !== currentTask && t.completed < t.estimated
+              )?.id;
+              nextTaskId && updateCurrentTask(nextTaskId);
+            }
+          }
+          new Audio("sounds/button.mp3").play();
         }
-      }
-      new Audio("sounds/button.mp3").play();
-    }
-  }, [secondsRemaining]);
+      },
+    [secondsRemaining]
+  );
   const progressPercent = 100 - (secondsRemaining * 100) / (currentTimer * 60);
   const firstClick = useRef(false);
   return (
