@@ -1,6 +1,6 @@
 # Pomowaves
 
-Pomowaves is a customizable online Pomodoro Timer designed to boost your productivity. It works on both desktop and mobile browsers. The goal of this app is to help you stay focused on any task, whether it's studying, writing, or coding. This app is inspired by the **Pomodoro Technique**, a time management method developed by **Francesco Cirillo**.
+Pomowaves is a web app built to boost your productivity. The goal of this app is to help you stay focused on any task, whether it's studying, writing, or coding. This app is inspired by the **Pomodoro Technique**, a time management method developed by **Francesco Cirillo**.
 
 ## 📌 What is the Pomodoro Technique?
 
@@ -18,6 +18,8 @@ The **Pomodoro Technique** was created by Francesco Cirillo as a structured way 
 6. **Repeat the cycle** until all tasks are completed.
 7. **Track your productivity** with daily, weekly, and monthly progress insights to improve your workflow.
 8. Stay focused, be productive, and make the most out of your work sessions with Pomowaves!
+
+![alt text](assets/1744527572236.webp)
 
 ## Features
 ### Customizable Timers & Auto-Start Options  

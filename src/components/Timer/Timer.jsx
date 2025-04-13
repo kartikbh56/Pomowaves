@@ -60,48 +60,50 @@ export default function Timer() {
     };
   }, [status, currentTimer]);
 
-  useEffect(
-    () =>
-      async function () {
-        if (secondsRemaining <= 0) {
-          // when a timer gets finished
-          clearInterval(timerIdRef.current);
-          timerIdRef.current = null;
-          if (mode === "pomodoro") {
-            // when a pomodoro timer gets finished
-            finishPomodoro();
-            if (!currentTaskId && !currentTask) {
-              tasks = await fetchTasks();
-              currentTaskId = (await fetchCurrentTask()).currentTaskId;
-              currentTask = tasks.find((t) => t.id === currentTaskId);
-              currentTaskName = currentTask?.task;
-            }
-            updateTask(currentTaskId, {
-              completed: currentTask?.completed + 1,
-            });
-            addTimeLine(
-              currentTaskName,
-              startedAt,
-              new Date(
-                startedAt.getTime() +
-                  pomodoro * 60 * 1000 -
-                  secsCompletedAtPause * 1000
-              )
-            );
-          } else {
-            finishBreak();
-            if (currentTask.completed + 1 >= currentTask.estimated) {
-              const nextTaskId = tasks.find(
-                (t) => t.id !== currentTask && t.completed < t.estimated
-              )?.id;
-              nextTaskId && updateCurrentTask(nextTaskId);
-            }
-          }
-          new Audio("sounds/button.mp3").play();
+  useEffect(() => {
+    (async function () {
+      if (secondsRemaining <= 0) {
+        clearInterval(timerIdRef.current);
+        timerIdRef.current = null;
+  
+        if (!currentTaskId && !currentTask) {
+          tasks = await fetchTasks();
+          currentTaskId = (await fetchCurrentTask()).currentTaskId;
+          currentTask = tasks.find((t) => t.id === currentTaskId);
+          currentTaskName = currentTask?.task;
         }
-      },
-    [secondsRemaining]
-  );
+  
+        if (mode === "pomodoro") {
+          // when a pomodoro session gets finished
+          finishPomodoro();
+          updateTask(currentTaskId, {
+            completed: currentTask?.completed + 1,
+          });
+          addTimeLine(
+            currentTaskName,
+            startedAt,
+            new Date(
+              startedAt.getTime() +
+                pomodoro * 60 * 1000 -
+                secsCompletedAtPause * 1000
+            )
+          );
+        } else {
+          // when a break session gets finished
+          finishBreak();
+          if (currentTask.completed + 1 >= currentTask.estimated) {
+            const nextTaskId = tasks.find(
+              (t) => t.id !== currentTask && t.completed < t.estimated
+            )?.id;
+            nextTaskId && updateCurrentTask(nextTaskId);
+          }
+        }
+  
+        new Audio("sounds/button.mp3").play();
+      }
+    })();
+  }, [secondsRemaining]);
+  
   const progressPercent = 100 - (secondsRemaining * 100) / (currentTimer * 60);
   const firstClick = useRef(false);
   return (

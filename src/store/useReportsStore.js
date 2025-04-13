@@ -91,7 +91,7 @@ export const useReportsStore = create(
       },
 
       initTimeline: async () => {
-        const timeLine = await initialFetchTimeline(10);
+        const timeLine = await initialFetchTimeline(20);
         set({
           timeLine: timeLine.documents.map((r) => ({
             ...r,

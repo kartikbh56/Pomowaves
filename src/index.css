@@ -824,7 +824,7 @@ header {
   border-radius: 15px;
   background-color: white;
   position: relative;
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
   border-top: 1px solid rgb(239, 239, 239);
   border-bottom: 1px solid rgb(239, 239, 239);
@@ -949,7 +949,7 @@ header {
 }
 
 .table-body {
-  max-height: 400px;
+  height:80vh;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
