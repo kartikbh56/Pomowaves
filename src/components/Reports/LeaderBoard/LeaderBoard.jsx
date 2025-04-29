@@ -30,7 +30,7 @@ export default function LeaderBoard() {
         <div>DURATION</div>
       </div>
 
-      <div className="table-body">
+      <div className="table-body" style={{height:"auto"}}>
         {leaderboardEntries.length > 0 ? (
           <>
             {leaderboardEntries.map((entry, i) => (
