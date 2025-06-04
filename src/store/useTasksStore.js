@@ -7,7 +7,7 @@ import {
   fetchTasks,
   updateCurrentTask,
   updateTask,
-} from "../appwrite backend/db";
+} from "../backend/db";
 import { devtools } from "zustand/middleware";
 
 export const useTasksStore = create(

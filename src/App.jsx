@@ -18,7 +18,10 @@ import { useReportsStore } from "./store/useReportsStore.js";
 import { useTimerStore } from "./store/useTimerStore.js";
 import { useIsOpenStore } from "./store/useIsOpenStore.js";
 import { useTasksStore } from "./store/useTasksStore.js";
-import { getCurrentUser } from "./appwrite backend/auth.js";
+import { getCurrentUser } from "./backend/auth.js";
+
+
+
 
 export default function App() {
   const initTimeline = useReportsStore((state) => state.initTimeline);

@@ -2,7 +2,7 @@ import WeekSelector from "../timelineSelector/WeekSelector";
 import { useState, useEffect, useMemo } from "react";
 import TaskWiseStats from "./charts/TaskWiseStats";
 import WeekWiseStats from "./charts/WeekWiseStats";
-import { fetchTimelineOnDate } from "../../../../appwrite backend/db";
+import { fetchTimelineOnDate } from "../../../../backend/db";
 export default function WeekView() {
   const [dayOfTheWeek, setDayOfTheWeek] = useState(new Date());
 

@@ -9,7 +9,7 @@ import StartButton from "./StartButton";
 import { useTimerStore } from "../../store/useTimerStore";
 import { useTasksStore } from "../../store/useTasksStore";
 import { useReportsStore } from "../../store/useReportsStore";
-import { fetchCurrentTask, fetchTasks } from "../../appwrite backend/db";
+import { fetchCurrentTask, fetchTasks } from "../../backend/db";
 
 export default function Timer() {
   const timerIdRef = useRef(null);

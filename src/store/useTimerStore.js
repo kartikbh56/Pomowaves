@@ -3,7 +3,7 @@ import {
   createTimerSettings,
   fetchTimerSettings,
   updateTimerSettings,
-} from "../appwrite backend/db";
+} from "../backend/db";
 import { SettingsSavedToast } from "../components/Toast";
 import { devtools } from "zustand/middleware";
 import { sendNotification } from "../utils/notification";

@@ -5,7 +5,7 @@ import { ImStatsBars } from "react-icons/im";
 import { LuSettings2 } from "react-icons/lu";
 import { FiLogIn } from "react-icons/fi";
 import { useIsOpenStore } from "../store/useIsOpenStore";
-import { logout } from "../appwrite backend/auth";
+import { logout } from "../backend/auth";
 
 export default function Navbar({ user, setUser }) {
   const navigate = useNavigate();

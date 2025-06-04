@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import DaySelector from "../timelineSelector/DaySelector";
 import TaskWiseStats from "./charts/TaskWiseStats";
-import { fetchTimelineOnDate } from "../../../../appwrite backend/db";
+import { fetchTimelineOnDate } from "../../../../backend/db";
 
 export default function DayView() {
   const [selectedDate, setSelectedDate] = useState(

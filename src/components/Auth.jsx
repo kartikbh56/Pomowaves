@@ -4,7 +4,7 @@ import {
   loginWithGoogle,
   testUserLogin,
   getCurrentUser,
-} from "../appwrite backend/auth.js";
+} from "../backend/auth.js";
 import { FiLogIn } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 

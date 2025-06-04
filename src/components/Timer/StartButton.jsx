@@ -45,7 +45,7 @@ export default function StartButton({ firstClick }) {
   }, [mode, autoStartBreaks, status, autoStartPomodoros, firstClick]);
 
   function handleClick() {
-    new Audio("sounds/finger-snap.mp3").play();
+    new Audio("sounds/button.mp3").play();
     firstClick.current = true;
 
     if (status === "started") {

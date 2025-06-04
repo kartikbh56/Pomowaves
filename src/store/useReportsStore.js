@@ -11,7 +11,7 @@ import {
   initialFetchTimeline,
   updateLeaderboardProgress,
   updateReport,
-} from "../appwrite backend/db";
+} from "../backend/db";
 import {
   AddTimelineToast,
   DeleteTimelineToast,

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { fetchleaderboardEntries } from "../../../appwrite backend/db";
+import { fetchleaderboardEntries } from "../../../backend/db";
 export default function LeaderBoard() {
   const [leaderboardEntries, setLeaderboardEntries] = useState([]);
 

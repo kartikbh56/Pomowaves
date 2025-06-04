@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import MonthSelector from "../timelineSelector/MonthSelector";
 import TaskWiseStats from "./charts/TaskWiseStats";
 import MonthWiseStats from "./charts/MonthWise";
-import { fetchTimelineOnDate } from "../../../../appwrite backend/db";
+import { fetchTimelineOnDate } from "../../../../backend/db";
 export default function MonthView() {
   const [dayOfTheMonth, setDayOfTheMonth] = useState(new Date());
 
