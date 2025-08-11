@@ -31,7 +31,7 @@ const leaderboardCollectionId = import.meta.env
 export async function fetchTasks() {
   const result = await databases.listDocuments(
     databaseId, // databaseId
-    tasksCollectionId // collectionIdj
+    tasksCollectionId, // collectionIdj
   );
   return result.documents;
 }
@@ -46,7 +46,7 @@ export async function addTask(task, taskId) {
       Permission.read(Role.user(userId)), // Only this user can read
       Permission.update(Role.user(userId)), // Only this user can update
       Permission.delete(Role.user(userId)), // Only this user can delete
-    ]
+    ],
   );
   return result;
 }
@@ -56,7 +56,7 @@ export async function updateTask(documentId, modification) {
     databaseId, // databaseId
     tasksCollectionId, // collectionId
     documentId, // documentId
-    modification
+    modification,
   );
   return result;
 }
@@ -65,7 +65,7 @@ export async function deleteTask(documentId) {
   await databases.deleteDocument(
     databaseId, // databaseId
     tasksCollectionId, // collectionId
-    documentId // documentId
+    documentId, // documentId
   );
 }
 
@@ -76,7 +76,7 @@ export async function fetchCurrentTask() {
   // in currentTask collection, there should be only one document per user
   const result = await databases.listDocuments(
     databaseId,
-    currentTaskCollectionId
+    currentTaskCollectionId,
   );
   return result?.documents[0];
 }
@@ -91,9 +91,8 @@ export async function addCurrentTask(currentTaskId) {
       Permission.read(Role.user(userId)), // Only this user can read
       Permission.update(Role.user(userId)), // Only this user can update
       Permission.delete(Role.user(userId)), // Only this user can delete
-    ]
+    ],
   );
-  console.log("created currentTask", result)
   return result;
 }
 
@@ -102,7 +101,7 @@ export async function updateCurrentTask(currentTaskDocumentID, newTaskId) {
     databaseId,
     currentTaskCollectionId,
     currentTaskDocumentID,
-    { currentTaskId: newTaskId }
+    { currentTaskId: newTaskId },
   );
   return result;
 }
@@ -113,7 +112,7 @@ export async function updateCurrentTask(currentTaskDocumentID, newTaskId) {
 export async function fetchTimerSettings() {
   const result = await databases.listDocuments(
     databaseId, // databaseId
-    timerSettingsCollectionId // collectionId
+    timerSettingsCollectionId, // collectionId
   );
   return result?.documents[0];
 }
@@ -128,23 +127,22 @@ export async function createTimerSettings(timerSettings) {
       Permission.read(Role.user(userId)), // Only this user can read
       Permission.update(Role.user(userId)), // Only this user can update
       Permission.delete(Role.user(userId)), // Only this user can delete
-    ]
+    ],
   );
-  console.log("created timerSettings", result)
   return result;
 }
 
 export async function updateTimerSettings(
   timerSettingsDocumentId,
-  modification
+  modification,
 ) {
   const result = await databases.updateDocument(
     databaseId,
     timerSettingsCollectionId,
     timerSettingsDocumentId,
-    modification
+    modification,
   );
-  return result
+  return result;
 }
 
 /*********************************************************************************/
@@ -174,7 +172,7 @@ export async function fetchTimelineOnDate(fromDate, toDate) {
     ]),
     Query.limit(5000),
   ]);
-  return docs;
+  return docs.documents;
 }
 
 export async function addTimeLine(report) {
@@ -191,7 +189,7 @@ export async function addTimeLine(report) {
       Permission.read(Role.user(userId)), // Only this user can read
       Permission.update(Role.user(userId)), // Only this user can update
       Permission.delete(Role.user(userId)), // Only this user can delete
-    ]
+    ],
   );
 
   return result;
@@ -201,9 +199,19 @@ export async function deleteTimeline(documentId) {
   const result = await databases.deleteDocument(
     databaseId, // databaseId
     timeLineCollectionId, // collectionId
-    documentId // documentId
+    documentId, // documentId
   );
-  return result
+  return result;
+}
+
+export async function updateTimeline(documentId, modification) {
+  const result = await databases.updateDocument(
+    databaseId, // databaseId
+    timeLineCollectionId, // collectionId
+    documentId, // documentId
+    modification,
+  );
+  return result;
 }
 
 /******************************************************************/
@@ -223,9 +231,8 @@ export async function createReport(reports) {
       Permission.read(Role.user(userId)), // Only this user can read
       Permission.update(Role.user(userId)), // Only this user can update
       Permission.delete(Role.user(userId)), // Only this user can delete
-    ]
+    ],
   );
-  console.log("created reports",result)
   return result;
 }
 
@@ -234,7 +241,7 @@ export async function updateReport(reportsDocumentId, modification) {
     databaseId,
     reportsCollectionId,
     reportsDocumentId,
-    modification
+    modification,
   );
   return result;
 }
@@ -246,7 +253,7 @@ export async function fetchleaderboardEntries() {
   const docs = await databases.listDocuments(
     databaseId,
     leaderboardCollectionId,
-    [Query.orderDesc("minutesFocused")]
+    [Query.orderDesc("minutesFocused")],
   );
   return docs?.documents;
 }
@@ -255,7 +262,7 @@ export async function getUserFromLeaderboard(userId) {
   const result = await databases.listDocuments(
     databaseId, // databaseId
     leaderboardCollectionId, // collectionId
-    [Query.equal("userId", [userId])]
+    [Query.equal("userId", [userId])],
   );
   return result?.documents;
 }
@@ -265,7 +272,7 @@ export async function addUserToLeaderboard(userId, name) {
     databaseId, // databaseId
     leaderboardCollectionId, // collectionId
     ID.unique(), // documentId
-    { userId: userId, name: name, minutesFocused: 0 } // data
+    { userId: userId, name: name, minutesFocused: 0 }, // data
   );
   return result;
 }
@@ -275,7 +282,7 @@ export async function updateLeaderboardProgress(documentId, modification) {
     databaseId, // databaseId
     leaderboardCollectionId, // collectionId
     documentId, // documentId
-    modification
+    modification,
   );
-  return result
+  return result;
 }

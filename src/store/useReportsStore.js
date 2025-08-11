@@ -6,9 +6,7 @@ import {
   createReport,
   deleteTimeline,
   fetchReports,
-  fetchTimeline,
   getUserFromLeaderboard,
-  initialFetchTimeline,
   updateLeaderboardProgress,
   updateReport,
 } from "../backend/db";
@@ -25,20 +23,22 @@ export const useReportsStore = create(
       minutesFocused: 0, // total hours focused
       daysAccessed: 1, // fetched from the DB
       dayStreak: 1, // fetched from the DB
-      timeLine: [], //fetched from the DB and updated from client side as well as in the DB
-      totalDocs: 0,
+      // timeLine: [], // it's not needed, it's handled by tanstack
+      // totalDocs: 0,
       leaderBoardUserDocumentId: null,
 
       initReports: async () => {
-        const initialReports = get();
+        const minutesFocused = get().minutesFocused;
+        const daysAccessed = get().daysAccessed;
+        const dayStreak = get().dayStreak;
         const data = await fetchReports();
 
         if (!data) {
           // if there is no reports document for the user (new user), create one.
           const reports = await createReport({
-            minutesFocused: initialReports.minutesFocused,
-            daysAccessed: initialReports.daysAccessed,
-            dayStreak: initialReports.dayStreak,
+            minutesFocused,
+            daysAccessed,
+            dayStreak,
             lastAccessed: new Date().toISOString(),
           });
           set({
@@ -59,7 +59,7 @@ export const useReportsStore = create(
           const nextDay = new Date(
             lastAccessed.getFullYear(),
             lastAccessed.getMonth(),
-            lastAccessed.getDate() + 1
+            lastAccessed.getDate() + 1,
           );
 
           if (nextDay.toDateString() === today.toDateString()) {
@@ -90,26 +90,14 @@ export const useReportsStore = create(
         }
       },
 
-      initTimeline: async () => {
-        const timeLine = await initialFetchTimeline(20);
-        set({
-          timeLine: timeLine.documents.map((r) => ({
-            ...r,
-            startedAt: new Date(r.startedAt),
-            endedAt: new Date(r.endedAt),
-          })),
-          totalDocs: timeLine.total,
-        });
-      },
-
       initLeaderBoard: async (currentUser) => {
-        let { leaderBoardUserDocumentId } = get();
+        let leaderBoardUserDocumentId = get().leaderBoardUserDocumentId;
         const data = await getUserFromLeaderboard(currentUser.$id);
 
         if (!data.length) {
           const data = await addUserToLeaderboard(
             currentUser.$id,
-            currentUser.name
+            currentUser.name,
           );
           leaderBoardUserDocumentId = data.$id;
         } else {
@@ -119,8 +107,10 @@ export const useReportsStore = create(
       },
 
       addTimeLine: async (currentTaskName, startedAt, endedAt) => {
-        const { minutesFocused, $id, leaderBoardUserDocumentId, timeLine } =
-          get();
+        const minutesFocused = get().minutesFocused;
+        const $id = get().$id;
+        const leaderBoardUserDocumentId = get().leaderBoardUserDocumentId;
+        // const timeLine = get().timeLine;
 
         const report = {
           id: crypto.randomUUID(),
@@ -137,8 +127,8 @@ export const useReportsStore = create(
           }).then(() =>
             AddTimelineToast(
               report.task,
-              formatMinutes(getMinutes(report.startedAt, report.endedAt))
-            )
+              formatMinutes(getMinutes(report.startedAt, report.endedAt)),
+            ),
           );
 
         const minutes =
@@ -148,7 +138,7 @@ export const useReportsStore = create(
         const data = await updateReport($id, { minutesFocused: minutes });
         set({
           minutesFocused: data.minutesFocused,
-          timeLine: [report, ...timeLine],
+          // timeLine: [report, ...timeLine],
         });
 
         updateLeaderboardProgress(leaderBoardUserDocumentId, {
@@ -157,14 +147,9 @@ export const useReportsStore = create(
       },
 
       deleteTimeline: async (entry) => {
-        const { timeLine, minutesFocused, $id, leaderBoardUserDocumentId } =
-          get();
-        const updatedEntries = timeLine.filter(
-          (item) => (item.$id || item.id) !== (entry.id || entry.$id)
-        );
-        set({
-          timeLine: updatedEntries,
-        });
+        const minutesFocused = get().minutesFocused;
+        const $id = get().$id;
+        const leaderBoardUserDocumentId = get().leaderBoardUserDocumentId;
         DeleteTimelineToast(entry.task);
 
         const minutes =
@@ -181,23 +166,7 @@ export const useReportsStore = create(
           minutesFocused: data.minutesFocused,
         });
       },
-
-      fetchMoreTimelineEntries: async () => {
-        const { timeLine, totalDocs } = get();
-        const lastId = timeLine[timeLine.length - 1].$id;
-        const limit = 20;
-        let moreEntries = [];
-        if (timeLine.length < totalDocs) {
-          const data = await fetchTimeline(limit, lastId);
-          moreEntries = data.documents.map((d) => ({
-            ...d,
-            startedAt: new Date(d.startedAt),
-            endedAt: new Date(d.endedAt),
-          }));
-        }
-        set((state) => ({ timeLine: [...state.timeLine, ...moreEntries] }));
-      },
     }),
-    { name: "reports store" }
-  )
+    { name: "reports store" },
+  ),
 );

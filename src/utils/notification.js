@@ -5,12 +5,12 @@ export const sendNotification = (message) => {
       if (registration) {
         // Use service worker for mobile devices
         registration.showNotification(message, {
-          icon: "/icon.png", // Replace with your icon path if needed
+          icon: "", // Replace with your icon path if needed
         });
       } else {
         // Fallback for desktop browsers if no service worker is registered
         new Notification(message, {
-          icon: "/icon.png", // Replace with your icon path if needed
+          icon: "", // Replace with your icon path if needed
         });
       }
     });

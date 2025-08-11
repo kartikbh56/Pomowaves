@@ -54,7 +54,10 @@ export const useTasksStore = create(
       },
 
       addTask: (newTask) => {
-        let { currentTaskDocumentID, currentTask, tasks } = get();
+        // let { currentTaskDocumentID, currentTask, tasks } = get();
+        let currentTaskDocumentID = get().currentTaskDocumentID;
+        let currentTask = get().currentTask;
+        let tasks = get().tasks;
 
         addTask(newTask, newTask.id);
 
@@ -72,7 +75,9 @@ export const useTasksStore = create(
       },
 
       deleteTask: (id) => {
-        let { currentTask, tasks, currentTaskDocumentID } = get();
+        let tasks = get().tasks;
+        let currentTask = get().currentTask;
+        let currentTaskDocumentID = get().currentTaskDocumentID;
         const newTasks = tasks.filter((t) => t.id !== id);
 
         if (id === currentTask) {
@@ -96,7 +101,7 @@ export const useTasksStore = create(
       updateTask: async (id, updates) => {
         set((state) => ({
           tasks: state.tasks.map((t) =>
-            t.id === id ? { ...t, ...updates } : t
+            t.id === id ? { ...t, ...updates } : t,
           ),
         }));
 
@@ -105,18 +110,17 @@ export const useTasksStore = create(
       },
 
       updateCurrentTask: async (taskId) => {
-        const { currentTaskDocumentID } = get();
         set({ currentTask: taskId });
         //db
-        updateCurrentTask(currentTaskDocumentID, taskId);
+        updateCurrentTask(get().currentTaskDocumentID, taskId);
       },
 
       sortTasks: () => {
         set((state) => ({ tasks: sortTasks(state.tasks, state.currentTask) }));
       },
     }),
-    { name: "tasks store" }
-  )
+    { name: "tasks store" },
+  ),
 );
 
 function sortTasks(tasks, currentTaskId) {

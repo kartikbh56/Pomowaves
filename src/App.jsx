@@ -1,90 +1,88 @@
-import { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
+  Outlet,
 } from "react-router-dom";
-import Settings from "./components/Settings/Settings.jsx";
-import Tasks from "./components/Tasks/Tasks.jsx";
-import Summary from "./components/Summary.jsx";
-import Timer from "./components/Timer/Timer.jsx";
-import Navbar from "./components/Navbar.jsx";
-import Reports from "./components/Reports/ReportsMenu.jsx";
-import Auth from "./components/Auth.jsx";
-import { Toaster } from "react-hot-toast";
-import Loader from "./components/Loader.jsx";
-import { useReportsStore } from "./store/useReportsStore.js";
-import { useTimerStore } from "./store/useTimerStore.js";
-import { useIsOpenStore } from "./store/useIsOpenStore.js";
-import { useTasksStore } from "./store/useTasksStore.js";
-import { getCurrentUser } from "./backend/auth.js";
 
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
+import Home from "./pages/Home.jsx";
 
+import Leaderboard from "./pages/Leaderboard.jsx";
+import Reports from "./pages/Reports.jsx";
+import Auth from "./pages/Auth";
+import ProtectedRoute from "./pages/protectedRoute.jsx";
+
+import AppSidebar from "./components/app-sidebar.jsx";
+
+import { Toaster } from "@/components/ui/sonner";
+import TimeSheet from "./pages/Timesheet.jsx";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function App() {
-  const initTimeline = useReportsStore((state) => state.initTimeline);
-  const initLeaderBoard = useReportsStore((state) => state.initLeaderBoard);
-  const initReports = useReportsStore((state) => state.initReports);
-  const initTimerSettings = useTimerStore((state) => state.initTimerSettings);
-  const isSettingsOpen = useIsOpenStore((state) => state.settings);
-  const isReportsOpen = useIsOpenStore((state) => state.reports);
-  const initTasks = useTasksStore((state) => state.initTasks);
-
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Notification.permission === "default" && Notification.requestPermission();
-
-    async function fetchUser() {
-      try {
-        const currentUser = await getCurrentUser();
-        if (currentUser) {
-          setUser(currentUser);
-          initLeaderBoard(currentUser);
-          await initTimerSettings();
-          initTasks();
-          initReports();
-          initTimeline();
-        }
-      } catch (error) {
-        console.error("Authentication error:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchUser();
-  }, []);
-
-  if (loading) {
-    return <Loader />;
-  }
+  const queryClient = new QueryClient();
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/auth" element={<Auth user={user} setUser={setUser} />} />
-        <Route
-          path="/"
-          element={
-            user ? (
-              <div className="app">
-                <Navbar user={user} setUser={setUser} />
-                {isSettingsOpen && <Settings />}
-                {isReportsOpen && <Reports />}
-                <Timer />
-                <Tasks />
-                <Summary />
-                <Toaster style={{ zIndex: 1100 }} />
-              </div>
-            ) : (
-              <Navigate to="/auth" replace />
-            )
-          }
-        />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <QueryClientProvider client={queryClient}>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<Auth />} />
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/timesheet" element={<TimeSheet />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+              </Route>
+            </Route>
+          </Routes>
+        </QueryClientProvider>
+      </Router>
+      <Toaster
+        richColors
+        toastOptions={{
+          classNames: {
+            toast: "text-center font-varela text-base",
+            title: "text-center font-varela",
+            description: "text-center font-varela",
+          },
+        }}
+      />
+    </>
+  );
+}
+
+function AppLayout() {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <AppHeader />
+        <Outlet />
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function AppHeader() {
+  return (
+    <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2 px-3 sm:px-4 border-b lg:hidden md:hidden">
+      <SidebarTrigger className="-ml-1" />
+      <div className="flex items-center gap-2">
+        <div className="flex aspect-square size-6 sm:size-7 items-center justify-center rounded-md bg-gradient-to-br from-[#ba4a49] to-[#7e53a2] text-white">
+          <div className="size-3 sm:size-4 bg-white rounded-sm opacity-90" />
+        </div>
+        <span className="font-semibold text-sm sm:text-base">Pomowaves</span>
+      </div>
+    </header>
   );
 }

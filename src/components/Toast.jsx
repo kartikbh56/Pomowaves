@@ -1,119 +1,84 @@
-import toast from "react-hot-toast";
-
-const toastBackgroundStyle = {
-  backgroundColor: "rgba(0, 0, 0, 0.83)",
-  color: "white",
-};
+import { toast } from "sonner";
+import { Flame } from "lucide-react";
 
 export function StreakToast(streak) {
   toast(
-    <span>
-      🔥<strong style={{ color: "rgb(216, 86, 86)" }}>{streak}</strong> days
-      streak!
-    </span>,
-    { style: toastBackgroundStyle, duration: 5000 }
+    <div className="w-full flex items-center justify-center gap-2 text-center">
+      <Flame className="text-orange-500" />
+      <strong>{streak}</strong> days streak!
+    </div>,
+    { duration: 10000, position: "top-center" },
   );
 }
 
 export function AddTaskToast(task) {
   toast.success(
-    <span>
-      <strong style={{ color: "rgb(137, 236, 149)" }}>{task + " "}</strong>{" "}
-      added
-    </span>,
-    {
-      position: "bottom-center",
-      style: toastBackgroundStyle,
-    }
+    <div className="w-full text-center">
+      <strong>{task} </strong>added
+    </div>,
+    { position: "bottom-center" },
   );
 }
 
 export function UpdateTaskToast(task) {
   toast.success(
-    <span>
-      <strong style={{ color: "rgb(109, 234, 124)" }}>{task + " "}</strong>{" "}
-      updated
-    </span>,
-    {
-      position: "bottom-center",
-      style: toastBackgroundStyle,
-    }
+    <div className="w-full text-center">
+      <strong>{task} </strong>updated
+    </div>,
+    { position: "bottom-center" },
   );
 }
 
 export function DeleteTaskToast(task) {
   toast.success(
-    <span>
-      <strong style={{ color: "rgb(230, 159, 159)" }}>{task + " "}</strong>{" "}
-      deleted
-    </span>,
-    {
-      position: "bottom-center",
-      style: toastBackgroundStyle,
-      iconTheme: { primary: "rgb(182, 63, 63)" },
-    }
+    <div className="w-full text-center">
+      <strong>{task} </strong>deleted
+    </div>,
+    { position: "bottom-center" },
   );
 }
 
 export function CurrentTaskToast(currentTask) {
   toast.success(
-    <span>
-      Current task:
-      <strong style={{ color: "rgb(109, 234, 124)" }}>
-        {" " + currentTask}
-      </strong>
-    </span>,
-    {
-      position: "bottom-center",
-      style: toastBackgroundStyle,
-    }
+    <div className="w-full text-center">
+      Current task: <strong>{currentTask}</strong>
+    </div>,
+    { position: "bottom-center" },
   );
 }
 
 export function SettingsSavedToast() {
-  toast.success(<span>Settings Saved</span>, {
+  toast.success(<div className="w-full text-center">Settings Saved</div>, {
     position: "bottom-center",
-    style: toastBackgroundStyle,
   });
 }
 
 export function DeleteTimelineToast(timeline) {
   toast.success(
-    <span>
-      <strong style={{ color: "rgb(247, 165, 165)" }}>{timeline}</strong>{" "}
-      timeline deleted
-    </span>,
-    {
-      position: "bottom-center",
-      style: toastBackgroundStyle,
-      iconTheme: { primary: "rgb(223, 103, 103)" },
-    }
+    <div className="w-full text-center">
+      <strong>{timeline}</strong> deleted
+    </div>,
+    { position: "bottom-center" },
   );
 }
 
 export function AddTimelineToast(timeline, minutes) {
   toast.success(
-    <span>
-      Progress saved:
-      <strong style={{ color: "rgb(109, 234, 124)" }}>{" " + timeline}</strong>
-      <strong>{` (${minutes})`}</strong>
-    </span>,
-    {
-      position: "bottom-center",
-      style: toastBackgroundStyle,
-    }
+    <div className="w-full text-center">
+      Progress saved: <strong>{timeline}</strong> <strong>({minutes})</strong>
+    </div>,
+    { position: "bottom-center" },
   );
 }
 
 export function TasksFinishedToast() {
   toast.success(
-    <span>
-      You have finised all your tasks🎉
-    </span>,
+    <div className="w-full text-center">
+      You have finished all your tasks 🎉
+    </div>,
     {
       position: "bottom-center",
-      style: toastBackgroundStyle,
-      duration:10000
-    }
+      duration: 10000,
+    },
   );
 }

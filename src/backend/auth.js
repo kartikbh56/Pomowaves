@@ -2,39 +2,43 @@ import { account } from "./appwrite";
 
 // Function to handle Google OAuth
 export async function loginWithGoogle() {
-  const session = await account.createOAuth2Session(
-    "google",
-    import.meta.env.VITE_GOOGLE_SUCCESS_URL, // Success URL (your app's URL)
-    import.meta.env.VITE_GOOGLE_FAILURE_URL // Failure URL
+  const baseUrl = window.location.origin;
+
+  // Instead of createOAuth2Session, use createOAuth2Token
+  account.createOAuth2Token(
+    "google", // or any other provider
+    `${baseUrl}/auth/callback`, // your callback URL
+    `${baseUrl}/auth`, // failure URL
   );
-  return session;
 }
 
+export const handleCallback = async (userId, secret) => {
+  try {
+    // Create a session using the OAuth2 token
+    await account.createSession(userId, secret);
+
+    // Get the user data
+    const user = await account.get();
+
+    // User is now authenticated!
+    return user;
+  } catch (error) {
+    console.error("Authentication failed:", error);
+    throw error;
+  }
+};
+
 export async function testUserLogin() {
-  const session = await account.createEmailPasswordSession(
-    "test@example.com",
-    "test@123"
-  );
-  return session;
+  await account.createEmailPasswordSession("test@example.com", "test@123");
 }
 
 // Function to get current session
 export const getCurrentUser = async () => {
-  try {
-    const user = await account.get();
-    return user;
-  } catch (error) {
-    console.error("Session error:", error);
-    return null;
-  }
+  const user = await account.get();
+  return user;
 };
 
 // Function to logout
 export const logout = async () => {
-  try {
-    await account.deleteSession("current");
-  } catch (error) {
-    console.error("Logout error:", error);
-    throw error;
-  }
+  await account.deleteSession("current");
 };

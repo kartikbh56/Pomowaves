@@ -18,8 +18,9 @@ const initialTimerSettings = {
   status: "initial", // initial, started, paused
   mode: "pomodoro", // pomodoro, shortBreak, longBreak
   completedPomodoros: 0,
-  startedAt: null, // new Date()
+  startedAt: null,
   secsCompletedAtPause: 0,
+  $id: null,
 };
 
 export const useTimerStore = create(
@@ -27,7 +28,7 @@ export const useTimerStore = create(
     (set, get) => ({
       ...initialTimerSettings,
       secondsRemaining: initialTimerSettings[initialTimerSettings.mode] * 60,
-
+      timerId: null,
       // setters
 
       // fetching  timer settings from the db
@@ -70,31 +71,47 @@ export const useTimerStore = create(
       },
 
       startTimer: () => {
-        const state = get();
+        const $id = get().$id;
         const startedState = {
           status: "started",
           startedAt: new Date(),
         };
-
-        set(startedState);
-
-        //db
-        updateTimerSettings(state.$id, {
+        set({ ...startedState });
+        updateTimerSettings($id, {
           ...startedState,
           startedAt: startedState.startedAt.toISOString(),
         });
       },
 
-      setCountdown: (secondsRemaining) => {
-        set({
-          secondsRemaining: secondsRemaining,
-        });
+      startCountdown: () => {
+        if (get().timerId) return; // prevent multiple intervals
+
+        const mode = get().mode;
+        const currentTimer = get()[mode] * 60;
+        const secsCompletedAtPause = get().secsCompletedAtPause;
+        const startedAt = get().startedAt;
+
+        const timerId = setInterval(() => {
+          const currentTime = Date.now();
+          const timeElapsed = Math.floor((currentTime - startedAt) / 1000);
+          const secondsRemaining =
+            currentTimer - secsCompletedAtPause - timeElapsed;
+          set({ secondsRemaining });
+        }, 1000);
+
+        set({ timerId });
       },
 
       pauseTimer: () => {
-        const state = get();
-        const secsCompletedAtPause =
-          state[state.mode] * 60 - state.secondsRemaining;
+        clearInterval(get().timerId);
+        set({ timerId: null });
+
+        const secondsRemaining = get().secondsRemaining;
+        const mode = get().mode;
+        const currentTimer = get()[mode] * 60;
+        const $id = get().$id;
+
+        const secsCompletedAtPause = currentTimer - secondsRemaining;
         const pausedState = {
           status: "paused",
           startedAt: null,
@@ -102,18 +119,19 @@ export const useTimerStore = create(
         };
         set(pausedState);
 
-        //db
-        updateTimerSettings(state.$id, pausedState);
+        updateTimerSettings($id, pausedState);
       },
 
       finishPomodoro: () => {
-        const state = get();
-        const completedPomodoros = state.completedPomodoros + 1;
+        const completedPomodoros = get().completedPomodoros + 1;
+        const longBreakInterval = get().longBreakInterval;
+        const $id = get().$id;
         const nextMode =
-          completedPomodoros % state.longBreakInterval === 0
+          completedPomodoros % longBreakInterval === 0
             ? "longBreak"
             : "shortBreak";
-        const secondsRemaining = state[nextMode] * 60;
+
+        const secondsRemaining = get()[nextMode] * 60;
         const finishedPomodoroState = {
           completedPomodoros: completedPomodoros,
           mode: nextMode,
@@ -121,60 +139,93 @@ export const useTimerStore = create(
           startedAt: null,
           secsCompletedAtPause: 0,
         };
+        clearInterval(get()?.timerId);
         set({
           ...finishedPomodoroState,
           secondsRemaining: secondsRemaining,
+          timerId: null,
         });
 
         //db
-        updateTimerSettings(state.$id, finishedPomodoroState);
+        updateTimerSettings($id, finishedPomodoroState);
 
         sendNotification(`Time to take a ${nextMode.split("B")[0]} break!`);
       },
 
       finishBreak: () => {
-        const state = get();
         const nextMode = "pomodoro";
-        const secondsRemaining = state[nextMode] * 60;
+        const secondsRemaining = get()[nextMode] * 60;
         const finishedBreakState = {
           mode: nextMode,
           status: "initial",
           startedAt: null,
           secsCompletedAtPause: 0,
         };
+        clearInterval(get().timerId);
         set({
           ...finishedBreakState,
+          timerId: null,
           secondsRemaining: secondsRemaining,
         });
         //db
-        updateTimerSettings(state.$id, finishedBreakState);
+        updateTimerSettings(get().$id, finishedBreakState);
         sendNotification("Time to Focus!");
       },
 
       saveSettings: (timerSettings) => {
-        const state = get();
-        let secsCompletedAtPause = state.secsCompletedAtPause;
-        let secondsRemaining =
-          state.status === "paused"
-            ? timerSettings[state.mode] * 60 - state.secsCompletedAtPause
-            : timerSettings[state.mode] * 60;
+        const mode = get().mode;
+        const status = get().status;
+        let secondsRemaining;
 
-        if (secsCompletedAtPause && state.status === "started") {
-          secondsRemaining -= state.secsCompletedAtPause;
+        if (status === "started") {
+          // Timer is running
+          const startedAt = get().startedAt;
+          const now = Date.now();
+          const elapsed = Math.floor((now - startedAt) / 1000) + get().secsCompletedAtPause;
+          secondsRemaining = timerSettings[mode] * 60 - elapsed;
+          if (secondsRemaining < 0) secondsRemaining = 0;
+
+          // Clear current interval
+          clearInterval(get().timerId);
+          set({ timerId: null });
+
+          // Update state with new settings and secondsRemaining (do not touch startedAt or secsCompletedAtPause)
+          set({
+            ...timerSettings,
+            secondsRemaining,
+          });
+
+          // Start a new interval that keeps using the same startedAt
+          const timerId = setInterval(() => {
+            const currentTime = Date.now();
+            const elapsedInner = Math.floor((currentTime - startedAt) / 1000) + get().secsCompletedAtPause;
+            const updatedSecondsRemaining = timerSettings[mode] * 60 - elapsedInner;
+            set({ secondsRemaining: updatedSecondsRemaining >= 0 ? updatedSecondsRemaining : 0 });
+          }, 1000);
+          set({ timerId });
+        } else if (status === "paused") {
+          // Timer is paused
+          secondsRemaining = timerSettings[mode] * 60 - get().secsCompletedAtPause;
+          if (secondsRemaining < 0) secondsRemaining = 0;
+          set({
+            ...timerSettings,
+            secondsRemaining,
+          });
+        } else {
+          // Timer is not running
+          secondsRemaining = timerSettings[mode] * 60;
+          set({
+            ...timerSettings,
+            secondsRemaining,
+          });
         }
 
-        set({
-          ...timerSettings,
-          secondsRemaining: secondsRemaining,
-        });
-
-        updateTimerSettings(state.$id, {
+        updateTimerSettings(get().$id, {
           ...timerSettings,
         }).then(() => SettingsSavedToast());
       },
 
       changeMode: (btn) => {
-        const state = get();
         const changeModeState = {
           mode: btn,
           status: "initial",
@@ -183,12 +234,14 @@ export const useTimerStore = create(
         };
         set({
           ...changeModeState,
-          secondsRemaining: state[btn] * 60,
+          secondsRemaining: get()[btn] * 60,
         });
+        clearInterval(get().timerId);
+        set({ timerId: null });
         //db
-        updateTimerSettings(state.$id, changeModeState);
+        updateTimerSettings(get().$id, changeModeState);
       },
     }),
-    { name: "timer store" }
-  )
+    { name: "timer store" },
+  ),
 );

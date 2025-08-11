@@ -19,7 +19,7 @@ The **Pomodoro Technique** was created by Francesco Cirillo as a structured way 
 7. **Track your productivity** with daily, weekly, and monthly progress insights to improve your workflow.
 8. Stay focused, be productive, and make the most out of your work sessions with Pomowaves!
 
-![alt text](assets/1744527572236.webp)
+![alt text](assets/pomodoro_technique.png)
 
 ## Features
 ### Customizable Timers & Auto-Start Options  
@@ -33,18 +33,21 @@ Pomowaves allows you to personalize your focus and break sessions to match your 
 - ⏱️ Configure the **Long Break Interval**, which determines how many Pomodoro sessions you complete before taking a long break.  
 
 
-![alt text](./assets/image.png)
+![alt text](./assets/settings.png)
+![alt text](./assets/timers.png)
+
+
 
 
 These features provide flexibility and automation, making it easier to stay focused and maintain a consistent work rhythm. 🎯  
 
-![alt text](./assets/image-4.png)
+<!-- ![alt text](./assets/image-4.png) -->
 
 ### Task Management & Progress Tracking  
 
  An intuitive task management system to help you stay focused and track your progress efficiently.  
 
- ![alt text](./assets/image-7.png)
+ ![alt text](./assets/task-manager.png)
 
 - 📝 **Add Tasks:** Easily add tasks you plan to work on for the day.  
 - 🎯 **Set Pomodoro Estimates:** Assign the number of Pomodoros needed to complete each task.  
@@ -56,85 +59,60 @@ These features provide flexibility and automation, making it easier to stay focu
 
 With this structured task management system, Pomowaves helps you stay on top of your work while efficiently utilizing the Pomodoro Technique! 🚀  
 
-## 📊 Reports
+## Reports
 
-Pomowaves provides detailed reports to help you analyze your productivity. The Reports section consists of three parts:
+Pomowaves provides detailed reports to help you analyze your productivity and gives a high-level overview of your focus time and progress:
 
-### Summary
-The Summary gives a high-level overview of your focus time and progress:
+### Daily stats
+![alt text](./assets/reports-1.png)
 
-![alt text](./assets/image-10.png)
+### Weekly stats
+![alt text](./assets/reports-2.png)
 
-- 🕒 **Total Hours Focused** – Cumulative focus time since the first usage.
-- 📆 **Days Accessed** – Number of days you’ve used the app.
-- 🔥 **Streak** – Consecutive days you’ve stayed productive.
-- 📅 View your focus progress **day-wise, week-wise, or month-wise**.
+### Monthly stats
+![alt text](./assets/reports-3.png)
 
-### Monthly Progress Chart
-Displays daily focus time using a bar chart.
-- **X-axis**: Days of the month (1, 2, 3, …).
-- **Y-axis**: Hours focused on each day.
-- 🛠 **Tooltip**: Hovering over a bar reveals total hours focused on that day along with a breakdown of time spent on individual tasks.
 
-### Task-Wise Focus Chart
-- 📌 Shows total focus time for each task throughout the month.
-- **X-axis**: Task names.
-- **Y-axis**: Time spent on each task.
-
-### Total Time Focused
-Displays the **cumulative focus hours** for the selected month.
-
----
-
-### Details
+### Timesheet
 The Details section provides an in-depth log of all Pomodoro sessions, including:
 
 - 📅 **Date & Time** – When the session took place.
 - ✅ **Task Name** – The task worked on.
 - ⏳ **Duration** – The total focus time spent on that task.
+- 📝 **Note** – A short note about the session. 
 
-📜 The table is **scrollable**, and older records **load dynamically** as you scroll down.
 
-![alt text](./assets/image-11.png)
+![alt text](./assets/timesheet.png)
 
-### 3️⃣ Leaderboard
+### Leaderboard
 Compete with other users and track your rank on the Leaderboard:
 
 - 🏆 Displays users with the **highest total focus hours**.
-- 📊 Shows **rankings, usernames, and total duration** of focused time.
+- 🥇 Shows **rankings, usernames, and total duration** of focused time.
 - 🚀 Stay motivated by **climbing the leaderboard**!
 
 
-![alt text](./assets/image-14.png)
+![alt text](./assets/leaderboard.png)
 
 
 ## Technologies Used  
 
 ### Frontend  
 - **React.js** – The core framework used to build the Pomowaves UI, ensuring a smooth and interactive user experience.  
-- **CSS** – For styling and creating a visually appealing interface.    
+- **TailwindCSS** – Utility-first CSS framework for building a responsive and visually appealing interface.  
+- **ShadCN UI** – A component library built on Radix UI and TailwindCSS, used to create accessible and customizable UI components.  
 
 ### State Management  
 - **Zustand** – A lightweight and scalable state management library that replaces reducers and Context API, making state handling more efficient.  
+
+### Data Layer  
+- **TanStack Query (React Query)** – For efficient data fetching, caching, prefetching, ensuring seamless API interaction and a responsive user experience. 
+ 
 
 ### Data Visualization  
 - **Recharts** – Used to display focus hour statistics in visually appealing bar charts, enabling users to track their productivity trends over time.  
 
 ### Backend & Authentication  
-- **Appwrite** – Handles the backend, including user authentication, database management, and real-time data synchronization.  
+- **Appwrite** – Handles the backend, including user authentication, database management. 
 - **OAuth Google Authentication** – Integrated via Appwrite, allowing users to log in seamlessly using their Google accounts.  
-
-### Notifications  
-- **React Hot Toast** – Provides toast notifications for instant feedback on user actions like task updates and session completions. 
-
-## 📂 Component Structure
-![alt text](./assets/image-15.png)
-
-
-
-
-
-
-
-
 
