@@ -13,6 +13,7 @@ import {
   YAxis,
   Tooltip as RechartsTooltip,
   LabelList,
+  CartesianGrid,
 } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { formatMinutes, getMinutes } from "../../utils/formatDate";
@@ -40,7 +41,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           >
             {t.task}
             <div className="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums">
-               {formatMinutes(t.minutes)}
+              {formatMinutes(t.minutes)}
             </div>
           </div>
         ))}
@@ -131,7 +132,7 @@ export default function MonthWiseBarChart({
             data={displayedData}
             margin={{ left: 10, right: 10, top: 10, bottom: 0 }}
           >
-            {/* <CartesianGrid strokeDasharray="3 3" /> */}
+            <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="day"
               tickLine={false}
@@ -145,16 +146,16 @@ export default function MonthWiseBarChart({
               tickLine={false}
               domain={[
                 0,
-                Math.floor(Math.max(...monthStats.map((d) => d.minutes)) * 1.8),
+                Math.floor(Math.max(...monthStats.map((d) => d.minutes)) * 1.5),
               ]}
             />
             <RechartsTooltip content={<CustomTooltip />} cursor={false} />
             <Bar
               dataKey="minutes"
               fill="var(--color-minutes)"
-              fillOpacity={0.6}
+              fillOpacity={0.8}
 
-              radius={["5", "5", "0", "0"]}
+              radius={["4", "4", "0", "0"]}
               isAnimationActive
               animationDuration={500}
               animationEasing="ease-in-out"

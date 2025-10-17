@@ -30,7 +30,6 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
 
   const formattedDate = new Date(label).toLocaleDateString("en-US", {
-    weekday: "short",
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -44,11 +43,12 @@ const CustomTooltip = ({ active, payload, label }) => {
         {timeline?.map((t) => (
           <div
             key={crypto.randomUUID()}
-            className="flex basis-full items-center text-xs font-medium"
+            className="flex basis-full items-center gap-2 text-xs font-medium"
           >
-            {t.task}
-            <div className="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums">
-               {formatMinutes(t.minutes)}
+            <div className="min-w-0 flex-1 truncate">{t.task}</div>
+
+            <div className="text-foreground flex items-baseline gap-0.5 font-mono font-medium tabular-nums shrink-0">
+              {formatMinutes(t.minutes)}
             </div>
           </div>
         ))}
@@ -143,15 +143,15 @@ export default function WeekWiseBarChart({ data, firstDayOfTheWeek }) {
               hide={true}
               domain={[
                 0,
-                Math.floor(Math.max(...weekStats.map((d) => d.minutes)) * 2),
+                Math.floor(Math.max(...weekStats.map((d) => d.minutes)) * 1.5),
               ]}
             />
             <ChartTooltip content={<CustomTooltip />} cursor={false} />
-            <CartesianGrid vertical={false} horizontal={false} />
+            <CartesianGrid strokeDasharray="3 3" />
             <Bar
               dataKey="minutes"
               fill="var(--color-minutes)"
-              fillOpacity={0.6}
+              fillOpacity={0.8}
               radius={["8", "8", "0", "0"]}
               isAnimationActive
               animationDuration={500}

@@ -22,13 +22,8 @@ import {
 
 import { ChartContainer } from "@/components/ui/chart";
 import { formatMinutes } from "../../utils/formatDate";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TaskTooltip = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
@@ -77,18 +72,12 @@ export default function TaskWiseChart({ data }) {
           <CardTitle>Tasks</CardTitle>
           <CardDescription>Tasks distribution</CardDescription>
         </div>
-        <Select
-          value={chartType}
-          onValueChange={(value) => setChartType(value)}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Select Chart Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pie">Pie Chart</SelectItem>
-            <SelectItem value="bar">Bar Chart</SelectItem>
-          </SelectContent>
-        </Select>
+        <Tabs value={chartType} onValueChange={setChartType}>
+          <TabsList>
+            <TabsTrigger value="pie">Pie</TabsTrigger>
+            <TabsTrigger value="bar">Bar</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <div className="p-6 pt-0 space-y-4">
         <ChartContainer config={chartConfig}>
@@ -108,7 +97,7 @@ export default function TaskWiseChart({ data }) {
                   dataKey="minutes"
                   maxBarSize={150}
                   fill="var(--chart-1)"
-                  fillOpacity={0.6}
+                  fillOpacity={0.8}
                   radius={[8, 8, 0, 0]}
                   isAnimationActive={true}
                   animationDuration={500}

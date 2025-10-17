@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Area, AreaChart, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 
 import {
@@ -17,9 +17,25 @@ const chartConfig = {
   },
 };
 
+function getNextHourLabel(hourIndex) {
+  const next = (hourIndex + 1) % 24;
+  return `${next % 12 || 12} ${next < 12 ? "AM" : "PM"}`;
+}
+
 export default function DayWiseAreaChart({ data }) {
-  const chartData = prepareProductivityData(data);
-  console.log(chartData)
+const baseData = prepareProductivityData(data);
+
+const chartData = baseData.length
+  ? [
+      ...baseData,
+      {
+        ...baseData[baseData.length - 1],
+        hourIndex: baseData[baseData.length - 1].hourIndex + 1,
+        hour: getNextHourLabel(baseData[baseData.length - 1].hourIndex),
+        minutes: 0, // or keep same value if you want flat ending
+      },
+    ]
+  : baseData;  console.log(chartData)
   return (
     <Card className="border-none">
       <CardHeader>
@@ -43,7 +59,7 @@ export default function DayWiseAreaChart({ data }) {
               tickMargin={5}
               domain={[
                 0,
-                Math.floor(Math.max(...chartData.map((d) => d.minutes)) * 2),
+                Math.floor(Math.max(...chartData.map((d) => d.minutes)) * 1.8),
               ]}
             />
 
@@ -66,6 +82,9 @@ export default function DayWiseAreaChart({ data }) {
                 />
               </linearGradient>
             </defs>
+
+                <CartesianGrid strokeDasharray="3 3" />
+
 
             <Area
               dataKey="minutes"
